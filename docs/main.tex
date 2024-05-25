@@ -258,12 +258,11 @@ Uz ove metrike, koristili smo i matricu konfuzije za dodatnu evaluaciju modela. 
 Ove metrike omogućavaju sveobuhvatnu evaluaciju performansi modela, pružajući uvid u njegovu tačnost, sposobnost prepoznavanja pravih pozitivnih instanci i balans između preciznosti i odziva. U daljim sekcijama biće prikazani rezultati i obzervacije za svaki korišćeni algoritam.
 
 
+\clearpage
 
 \subsection{Stabla odlučivanja}
 Decision tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih algoritama za klasifikaciju. Radi tako što deli podatke na osnovu vrednosti atributa i pravi hijerarhijsku strukturu odluka, gde svaka grana predstavlja ishod odluke, a svaki čvor predstavlja atribut po kojem se podaci dele.
 
-\subsection{Decision Tree}
-Decision Tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih algoritama za klasifikaciju. Radi tako što deli podatke na osnovu vrednosti atributa i pravi hijerarhijsku strukturu odluka, gde svaka grana predstavlja ishod odluke, a svaki čvor predstavlja atribut po kojem se podaci dele.
 
 \subsubsection{Trening}
 
@@ -298,8 +297,43 @@ Matrica konfuzije pruža dodatni uvid u rezultate evaluacije modela, prikazujuć
 \label{fig:decision_tree_cm}
 \end{figure}
 
-Ovi rezultati potvrđuju da Decision Tree algoritam može biti izuzetno efikasan za klasifikaciju nebeskih objekata, pružajući visok nivo tačnosti i pouzdanosti.
+Ovi rezultati potvrđuju da algoritam stabla odlučivanja može biti izuzetno efikasan za klasifikaciju nebeskih objekata, pružajući visok nivo tačnosti i pouzdanosti.
 
+\subsection{Logistička regresija}
+Logistička regresija (logistic regression) je popularan algoritam za binarnu klasifikaciju koji modelira verovatnoću da primerak pripada određenoj klasi. Algoritam koristi logističku funkciju za predikciju verovatnosti, a zatim klasifikuje primerke na osnovu praga verovatnoće (obično 0.5).
+
+\subsubsection{Treniranje i evaluacija}
+Za treniranje modela korišćen je skup podataka koji je prethodno podeljen na trening, validacioni i test skupove. Podaci su skalirani kako bi se obezbedila bolja konvergencija i kvalitet modela.
+
+Kako bismo dodatno poboljšali kvalitet modela i smanjili varijansu, korišćena je unakrsna validacija. Ovaj pristup omogućava bolju procenu kvaliteta modela na različitim podskupovima podataka i pomaže u smanjenju uticaja neuravnoteženosti klasa.
+
+\subsubsection{Rezultati Unakrsne Validacije}
+Prosečna tačnost modela procenjena unakrsnom validacijom je pokazala visok nivo tačnosti, sa malim standardnim odstupanjem, što ukazuje na konzistentne performanse modela.
+
+\begin{verbatim}
+Mean Accuracy: 0.991 (0.001)
+\end{verbatim}
+
+\clearpage
+
+\subsubsection{Rezultati}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{logistic_regression_classification_report.png}
+\caption{Rezultati klasifikacije modela na test skupu}
+\label{fig:logistic_regression_classification_report}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{logistic_regression_cm.png}
+\caption{Matrica konfuzije za Logistic Regression model na test skupu}
+\label{fig:logistic_regression_cm}
+\end{figure}
+
+Iako ovaj model postiže dobre sveobuhvatne metrike, kao što su visoka tačnost, preciznost i odziv, primećeno je da ima tendenciju grešaka u klasifikaciji galaksija. Konkretno, model često pogrešno klasifikuje galaksije kao zvezde, što je prikazano u matrici konfuzije na slici \ref{fig:logistic_regression_cm}.\\\\
+Ova greška može biti značajna u određenim aplikacijama, čime stabla odlčivanja postaju bolji izbor za ovaj zadatak zbog veće preciznosti u razlikovanju klasa.
 
 \section{Zaključak}
 
