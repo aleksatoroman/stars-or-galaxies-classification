@@ -270,7 +270,7 @@ Za treniranje Decision Tree modela korišćen je skup podataka koji je prethodno
 
 Decision Tree algoritmi imaju različite hiperparametre koji mogu uticati na kvalitet modela. Neki od tih hiperparametara uključuju maksimalnu dubinu stabla, minimalan broj uzoraka potrebnih za podelu čvora, minimalan broj uzoraka u listu i broj karakteristika koje se koriste za traženje najboljeg podele.
 
-Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu sklearn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo f1 score s obzirom na neuravnoteženost podataka.
+Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu sklearn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan od parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo f1 score s obzirom na neuravnoteženost podataka. Važno je napomenuti da se ove promene hiperparametara i traženje najboljeg modela zasnivaju na evaluaciji modela u svakoj iteraciji pretrage koristeći validacioni skup podataka.
 
 
 \subsubsection{Rezultati}
