@@ -126,7 +126,7 @@ Korišćenjem ovog pristupa, uspeli smo da identifikujemo i uklonimo outlier-e i
 
 \subsection{Odabrani atributi za treniranje modela}
 
-Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'dec', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift'. Ovi atributi su pažljivo odabrani na osnovu njihove relevantnosti u astrofizici i njihove sposobnosti da pomognu u razlikovanju zvezda i galaksija.
+Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'dec', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift', kao i izračunati atributi 'color\_u\_g', 'color\_g\_r', 'color\_r\_i', 'color\_i\_z'. Ovi atributi su pažljivo odabrani na osnovu njihove relevantnosti u astrofizici i njihove sposobnosti da pomognu u razlikovanju zvezda i galaksija.
 
 \begin{itemize}
     \item \textbf{RA (Right Ascension)}: Ovo je jedna od dve osnovne nebeske koordinate koje se koriste za određivanje položaja nebeskih objekata na nebeskoj sferi. RA se meri u satima, minutima i sekundama, i predstavlja ugaonu udaljenost objekta istočno od Prolećne tačke. RA je ekvivalent geografskoj dužini na Zemlji.
@@ -140,6 +140,14 @@ Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'de
         \item \textbf{r (crveni filter)}: Mera sjaja u crvenom delu spektra.
         \item \textbf{i (bliski infracrveni filter)}: Mera sjaja u bliskom infracrvenom delu spektra.
         \item \textbf{z (daleki infracrveni filter)}: Mera sjaja u dalekom infracrvenom delu spektra.
+    \end{itemize}
+
+        \item \textbf{Colour-indexes}: Ovi atributi su izračunati na osnovu magnituda i predstavljaju razliku između sjaja u različitim delovima spektra. Oni pružaju dodatne informacije o karakteristikama nebeskih objekata.
+    \begin{itemize}
+        \item \textbf{color\_u\_g}: Razlika između magnituda u ultraljubičastom (u) i zelenom (g) delu spektra: $color\_u\_g = u - g$.
+        \item \textbf{color\_g\_r}: Razlika između magnituda u zelenom (g) i crvenom (r) delu spektra: $color\_g\_r = g - r$.
+        \item \textbf{color\_r\_i}: Razlika između magnituda u crvenom (r) i bliskom infracrvenom (i) delu spektra: $color\_r\_i = r - i$.
+        \item \textbf{color\_i\_z}: Razlika između magnituda u bliskom infracrvenom (i) i dalekom infracrvenom (z) delu spektra: $color\_i\_z = i - z$.
     \end{itemize}
     
     \item \textbf{Class (klasa)}: Ovaj atribut označava klasifikaciju objekta kao zvezda ili galaksija. Ovo je ciljna promenljiva u klasifikacionom modelu.
