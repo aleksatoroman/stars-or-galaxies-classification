@@ -203,23 +203,103 @@ Na grafikonu su prikazane korelacije između atributa za zvezde (desno) i galaks
 \end{itemize}
 
 \subsection{Priprema podataka za treniranje modela}
+Za uspešno treniranje i evaluaciju klasifikacionih modela, skup podataka je podeljen na tri dela: trening skup, validacioni skup i test skup. Ovaj pristup omogućava pravilnu procenu performansi modela i njegovu generalizaciju na nove podatke.
+
+\subsubsection{Podela Skupa Podataka}
+Skup podataka je podeljen na sledeći način:
+\begin{itemize}
+    \item \textbf{Trening Skup (Training Set)}: Ovaj skup podataka se koristi za treniranje modela. Model uči obrasce i veze između atributa na osnovu ovog skupa.
+    \item \textbf{Validacioni Skup (Validation Set)}: Ovaj skup se koristi za validaciju modela tokom procesa treniranja. Validacioni skup omogućava podešavanje hiperparametara modela i sprečavanje preprilagođavanju modela. Ukoliko bismo izbacili ovaj skup, onda bismo evaluaciju modela radili na testnim podacima i ukoliko se ispostavi da su rezultati loši i da parametri algoritma moraju da se menjaju, značilo bi da model prilagođavamo testnim podacima koji bi trebali da ostanu "skriveni" sve do samog kraja.
+    \item \textbf{Test Skup (Test Set)}: Ovaj skup se koristi za konačnu evaluaciju modela nakon što je treniran i validiran. Test skup pruža nezavisnu procenu performansi modela na novim, nepoznatim podacima.
+\end{itemize}
+
+Podaci su podeljeni tako da trening skup čini 60\% ukupnih podataka, validacioni skup 20\%, i test skup preostalih 20\%. Ova podela je odabrana kako bi se osiguralo da ima dovoljno podataka za treniranje modela, ali i dovoljno za validaciju i testiranje.\\
+Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.
+
+\subsubsection{Skaliranje Podataka}
+Skaliranje podataka je ključan korak u pripremi podataka za treniranje modela. Podaci su standardizovani tako da imaju srednju vrednost 0 i standardnu devijaciju 1. Ovo je važno jer određeni algoritmi klasifikacije zahtevaju skalirane podatke kako bi se izbeglo da atributi sa većim opsegom vrednosti postanu automatski važniji od ostalih atributa. Skaliranje osigurava da svi atributi imaju jednaku težinu prilikom treniranja modela.\\\\
+Skaliranje podataka je takođe značajno za mnoge optimizacione algoritme, kao što je gradijentni spust, jer doprinosi bržoj konvergenciji i stabilnijem učenju modela. Standardizacija podataka omogućava algoritmima da efikasnije pretražuju prostor rešenja, što rezultira boljim performansama i bržim treniranjem.
 
 
 
-\section{Algoritmi}
+\section{Klasifikacioni Algoritmi}
 
-\subsection{Slučajne šume}
-Opis teorije i implementacije.
+\subsection{Metrike za Evaluaciju Modela}
+Za evaluaciju performansi klasifikacionih modela korišćene su sledeće metrike: tačnost (accuracy), preciznost (precision), odziv (recall), F1-score i podrška (support). Ove metrike omogućavaju sveobuhvatnu procenu kvaliteta modela i njegove sposobnosti da tačno klasifikuje nebeske objekte kao zvezde ili galaksije.\\
+Važno je napomenuti da je skup podataka neuravnotežen, sa znatno većim brojem galaksija u odnosu na zvezde. U ovakvim situacijama, određene metrike, kao što su F1-score i odziv, postaju posebno važne za procenu performansi modela.
+
+\begin{itemize}
+    \item \textbf{Tačnost (Accuracy)}: Tačnost je mera koja pokazuje procenat tačno klasifikovanih instanci od ukupnog broja instanci. Visoka tačnost ukazuje na to da model dobro prepoznaje i zvezde i galaksije.
+    \[
+    \text{Tačnost} = \frac{\text{Broj tačno klasifikovanih instanci}}{\text{Ukupan broj instanci}}
+    \]
+    
+    \item \textbf{Preciznost (Precision)}: Preciznost pokazuje koliko od svih instanci koje su modelom klasifikovane kao pozitivne (npr. zvezde) zaista pripada pozitivnoj klasi. Visoka preciznost znači da je mali broj lažno pozitivnih klasifikacija.
+    \[
+    \text{Preciznost} = \frac{\text{TP}}{\text{TP} + \text{FP}}
+    \]
+    gde su TP pravi pozitivni, a FP lažno pozitivni primerci.
+
+    \item \textbf{Odziv (Recall)}: Odziv pokazuje koliko od svih stvarno pozitivnih instanci model tačno prepoznaje kao pozitivne. Visok odziv znači da je model sposoban da prepozna većinu pozitivnih instanci, što je posebno važno u neuravnoteženim datasetima gde je potrebno identifikovati što više pozitivnih instanci.
+    \[
+    \text{Odziv} = \frac{\text{TP}}{\text{TP} + \text{FN}}
+    \]
+    gde su TP pravi pozitivni, a FN lažno negativni primerci.
+
+    \item \textbf{F1-score}: F1-score je harmonijska sredina preciznosti i odziva i koristi se kao jedinstvena mera performansi modela, naročito kada postoji neuravnoteženost klasa. F1-score uzima u obzir i preciznost i odziv, pružajući balansiranu meru performansi modela.
+    \[
+    \text{F1-score} = 2 \cdot \frac{\text{Preciznost} \cdot \text{Odziv}}{\text{Preciznost} + \text{Odziv}}
+    \]
+
+    \item \textbf{Podrška (Support)}: Podrška označava broj instanci u svakoj klasi u skupu podataka. Koristi se za procenu uravnoteženosti klasa i može uticati na izbor metrika za evaluaciju modela.
+\end{itemize}
+
+Uz ove metrike, koristili smo i matricu konfuzije za dodatnu evaluaciju modela. Matrica konfuzije je tabela koja prikazuje stvarne klase naspram predviđenih klasa, omogućavajući identifikaciju tačno i pogrešno klasifikovanih instanci. Redovi matrice predstavljaju stvarne klase, dok kolone predstavljaju predviđene klase. Matrica konfuzije pomaže u vizualizaciji performansi modela i identifikaciji specifičnih vrsta grešaka, kao što su lažno pozitivni i lažno negativni primerci.\\\\
+Ove metrike omogućavaju sveobuhvatnu evaluaciju performansi modela, pružajući uvid u njegovu tačnost, sposobnost prepoznavanja pravih pozitivnih instanci i balans između preciznosti i odziva. U daljim sekcijama biće prikazani rezultati i obzervacije za svaki korišćeni algoritam.
+
+
 
 \subsection{Stabla odlučivanja}
-Opis teorije i implementacije.
+Decision tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih algoritama za klasifikaciju. Radi tako što deli podatke na osnovu vrednosti atributa i pravi hijerarhijsku strukturu odluka, gde svaka grana predstavlja ishod odluke, a svaki čvor predstavlja atribut po kojem se podaci dele.
 
-\section{Analiza rezultata}
+\subsection{Decision Tree}
+Decision Tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih algoritama za klasifikaciju. Radi tako što deli podatke na osnovu vrednosti atributa i pravi hijerarhijsku strukturu odluka, gde svaka grana predstavlja ishod odluke, a svaki čvor predstavlja atribut po kojem se podaci dele.
+
+\subsubsection{Trening}
+
+Za treniranje Decision Tree modela korišćen je skup podataka koji je prethodno podeljen na trening, validacioni i test skupove. Za treniranje modela nije bilo potrebno skalirati podatke, jer Decision Tree algoritmi ne zavise od udaljenosti između tačaka.
+
+Decision Tree algoritmi imaju različite hiperparametre koji mogu uticati na kvalitet modela. Neki od tih hiperparametara uključuju maksimalnu dubinu stabla, minimalan broj uzoraka potrebnih za podelu čvora, minimalan broj uzoraka u listu i broj karakteristika koje se koriste za traženje najboljeg podele.
+
+Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu sklearn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo f1 score s obzirom na neuravnoteženost podataka.
 
 
-\subsection{Trening i test skupovi}
+\subsubsection{Rezultati}
 
-\subsection{Performanse modela}
+Nakon optimizacije hiperparametara, Decision Tree model je evaluiran na test skupu podataka. Rezultati pokazuju visoku tačnost i odlične metrike za klasifikaciju.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{decision_tree_classification_report.png}
+\caption{Rezultati klasifikacije stabla odlučivanja na test skupu}
+\label{fig:decision_tree_classification_report}
+\end{figure}
+
+Rezultati pokazuju da je model stabla odlučivanja vrlo efikasan u klasifikaciji nebeskih objekata, sa visokim vrednostima preciznosti, odziva i F1-score-a za obe klase.
+
+\clearpage
+
+Matrica konfuzije pruža dodatni uvid u rezultate evaluacije modela, prikazujući tačne i netačne klasifikacije za svaku klasu.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{decision_tree_cm.png}
+\caption{Matrica konfuzije za model stabla odlučivanja na test skupu}
+\label{fig:decision_tree_cm}
+\end{figure}
+
+Ovi rezultati potvrđuju da Decision Tree algoritam može biti izuzetno efikasan za klasifikaciju nebeskih objekata, pružajući visok nivo tačnosti i pouzdanosti.
+
 
 \section{Zaključak}
 
