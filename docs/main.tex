@@ -343,6 +343,108 @@ Mean Accuracy: 0.991 (0.001)
 Iako ovaj model postiže dobre sveobuhvatne metrike, kao što su visoka tačnost, preciznost i odziv, primećeno je da ima tendenciju grešaka u klasifikaciji galaksija. Konkretno, model često pogrešno klasifikuje galaksije kao zvezde, što je prikazano u matrici konfuzije na slici \ref{fig:logistic_regression_cm}.\\\\
 Ova greška može biti značajna u određenim aplikacijama, čime stabla odlčivanja postaju bolji izbor za ovaj zadatak zbog veće preciznosti u razlikovanju klasa.
 
+\subsection{K-najbližih suseda}
+
+KNN(K-nearest neighbors= ili k-najbližih suseda je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom slučaju mi ćemo ga koristiti za klasifikaciju. Klasifikacija najbližih suseda je deo opšte tehnike poznate kao učenje zasnovano na instancama, koja ne gradi globalni model, već koristi primere iz treniranja za pravljenje predikcija za test instance. (Stoga se za takve klasifikatore često kaže da su "bez modela.") Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koristi za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje, Menhetn rastojanje...
+
+\subsubsection{Normalizacija i podela podataka}
+Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na trening i test skupove. Kod k najbližih suseda neophodno je da su podaci normalizocani, zato što algoritam koristi meri udaljenost između tačaka.
+Podatke treba normalizovati nakon što ih podelimo na trening i test skupove. Ovo je da bi se sprečilo "curenje podataka" jer bi normalizacija dala modelu dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom.
+
+\subsubsection{Prilagođavanje i evaluacija modela}
+Krećemo sa obučavanjem modela. Za ovo ćemo koristiti fiksiranu vrednost 5 za k, ali ćemo kasnije morati da optimizujemo ovo. Prvo kreiramo instancu KNN modela, zatim ćemo prilagoditi ovaj model našim trening podacima. Prosleđujemo i karakteristike i ciljnu promenljivu, tako da model može da uči.
+
+Nakon što je model obučen. Možemo napraviti predikcije na test skupu podataka, koje kasnije možemo koristiti za ocenjivanje modela.
+Najjednostavniji način za evaluaciju ovog modela je korišćenjem tačnosti. Proveravamo predikcije u odnosu na stvarne vrednosti u test setu i brojimo koliko je model tačno predvideo.
+U našem slučaju to iznosi
+
+\begin{verbatim}
+    KNN accuracy - test set: 0.9829
+\end{verbatim}
+
+\subsubsection{Optimizacija algortima}
+Izbor vrednosti 'k' igra ključnu ulogu u performansama KNN modela. Klasifikator sa malim brojem suseda odgovara visokoj složenosti modela što može dovesti do preprilagođavanja i verovatno će loše raditi na test skupu podataka. Sa druge strane, model sa mnogo suseda odgovara niskoj složenosti modela.
+Unakrsna validacija je proces pri kojem se skup podataka nasumično deli na 'k' grupa. Jedna od grupa se koristi kao test skup, dok se ostale koriste kao trening skup. Model se trenira na trening skupu i ocenjuje na test skupu. Zatim se proces ponavlja dok svaka jedinstvena grupa ne bude korišćena kao test skup.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{cross-validation.png}
+\caption{Unakrsna validacija}
+\label{fig:cross_validation}
+\end{figure}
+
+
+GridSearchCV funkcioniše tako što trenira naš model više puta sa različitim parametrima koje smo naveli. Na taj način, možemo testirati naš model sa svakim parametrom i pronaći optimalne vrednosti kako bismo dobili najbolje rezultate tačnosti.
+
+Prvo cemo odraditi grid pretragu da proverimo koji broj suseda ce dati najbolje performanse modela.
+Nakon treniranja, možemo proveriti koji od naših testiranih vrednosti za n\textunderscore neighbors je najbolje performirao. Da bismo to uradili, pozvaćemo best\textunderscore params\textunderscore  na našem modelu.
+
+\begin{verbatim}
+    Best params:  {'n_neighbors': 6}
+    Best estimator:  KNeighborsClassifier(n_neighbors=6)
+    Best score:  0.9828044147934559
+\end{verbatim}
+
+Vizualizujmo sad performanse modela za različite vrednosti k na trening podacima. Najbolje performanse su koristeći oko 6 suseda. Što je broj suseda veći to model postaje jednostavniji i tačnost na trening skupu opada. Međutim, ako pogledate y-osu, razlika između tačnosti nije velika i bilo koja vrednost 'k' bi dobro obavila posao na našem problemu jer je najgora performansa oko 0.976.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{knn_accuracy_vs_k.png}
+\caption{Odnos performansi modela i broja suseda}
+\label{fig:knn_accuracy_vs_k}
+\end{figure}
+
+Kako bismo još bolje optimizovali model koristićemo grid pretragu sa različitim parametrima.
+\begin{verbatim}
+    param_grid = {
+        "n_neighbors": np.arange(1,12),
+        "weights": ['uniform', 'distance'],
+        "metric": ["euclidean","manhattan"],
+        "n_jobs": [4]
+    }
+\end{verbatim}
+\begin{itemize}
+    \item n\textunderscore neighbors: Ovo predstavlja broj najbližih suseda koje k-NN algoritam treba da uzme u obzir.
+    \item weights: Ovo određuje način na koji se računa doprinos svakog suseda. Postoje dve opcije:
+    \begin{itemize}
+        \item uniform: Svi susedi imaju isti doprinos bez obzira na udaljenost
+        \item distance: Susedi bliži tački imaju veći doprinos nego udaljeni susedi.
+    \end{itemize}
+    \item metric: Ovo određuje način na koji se meri udaljenost između tačaka. Postoje dve opcije:
+    \begin{itemize}
+        \item euclidean
+        \item manhattan
+    \end{itemize}
+    \item n\textunderscore jobs: Ovo određuje broj paralelnih zadataka koje treba pokrenuti prilikom obrade. Vrednost 4 znači da će se koristiti četiri procesorska jezgra za paralelnu obradu.
+
+\end{itemize}
+\subsubsection{Rezultati}
+Rezultati su pokazali da je najbolja kombinacija parametara
+\begin{verbatim}
+Best params:  {'metric': 'manhattan', 'n_jobs': 4, 'n_neighbors': 6, 'weights': 'uniform'}
+Best estimator:  KNeighborsClassifier(metric='manhattan', n_jobs=4, n_neighbors=6)
+Best score:  0.9835416993884458
+\end{verbatim}
+
+Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobijen model na test podacima(podaci koje model nije jos uvek video) i da vidimo kolika će biti uspešnost modela.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{knn_best_est_result.png}
+\caption{Rezultati KNN modela na test skupu}
+\label{fig:knn_best_est_result}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{knn_cm.png}
+\caption{Matrica konfuzije za KNN model na test skupu}
+\label{fig:knn_cm}
+\end{figure}
+
+Korišćenjem unakrsne validacije i grid pretrage možemo dobiti značajnije rezultate u poređenju sa našim originalnim deljenjem trening/test sa minimalnim podešavanjima. Unakrsna validacija je veoma važna metoda koja se koristi za kreiranje bolje prilagođenih modela obukom i testiranjem na svim delovima skupa podataka za obuku.
+Iako unakrsna validacija može znatno koristiti razvoju modela, takođe postoji važna mana koja treba uzeti u obzir prilikom sprovođenja unakrsne validacije. Zbog toga što svaka iteracija modela, do k puta, zahteva da pokrenete ceo model, može postati računski skupo kako vaš skup podataka postaje veći i kako vrednost 'k' raste.
+
 \section{Zaključak}
 
 
