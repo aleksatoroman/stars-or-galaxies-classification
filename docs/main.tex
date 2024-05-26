@@ -394,7 +394,7 @@ Vizualizujmo sad performanse modela za različite vrednosti k na trening podacim
 \label{fig:knn_accuracy_vs_k}
 \end{figure}
 
-Kako bismo još bolje optimizovali model koristićemo grid pretragu sa različitim parametrima.
+Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
 \begin{verbatim}
     param_grid = {
         "n_neighbors": np.arange(1,12),
