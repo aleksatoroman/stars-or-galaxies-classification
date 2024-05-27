@@ -369,9 +369,11 @@ U našem slučaju to iznosi
     KNN accuracy - test set: 0.9829
 \end{verbatim}
 
-\subsubsection{Optimizacija algortima}
+\subsubsection{Optimizacija modela}
 Izbor vrednosti 'k' igra ključnu ulogu u performansama KNN modela. Klasifikator sa malim brojem suseda odgovara visokoj složenosti modela što može dovesti do preprilagođavanja i verovatno će loše raditi na test skupu podataka. Sa druge strane, model sa mnogo suseda odgovara niskoj složenosti modela.
 Unakrsna validacija je proces pri kojem se skup podataka nasumično deli na 'k' grupa. Jedna od grupa se koristi kao test skup, dok se ostale koriste kao trening skup. Model se trenira na trening skupu i ocenjuje na test skupu. Zatim se proces ponavlja dok svaka jedinstvena grupa ne bude korišćena kao test skup.
+
+\clearpage
 
 \begin{figure}[h!]
 \centering
@@ -396,11 +398,12 @@ Vizualizujmo sad performanse modela za različite vrednosti k na trening podacim
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.6\textwidth]{knn_accuracy_vs_knn.png}
+\includegraphics[width=0.7\textwidth]{knn_accuracy_vs_knn.png}
 \caption{Odnos performansi modela i broja suseda}
 \label{fig:knn_accuracy_vs_knn}
 \end{figure}
 
+\clearpage
 Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
 \begin{verbatim}
     param_grid = {
@@ -428,13 +431,15 @@ Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču n
 \subsubsection{Rezultati}
 Rezultati su pokazali da je najbolja kombinacija parametara
 \begin{verbatim}
-Best params:  {'metric': 'manhattan', 'n_jobs': 4, 'n_neighbors': 6, 'weights': 'uniform'}
-Best estimator:  KNeighborsClassifier(metric='manhattan', n_jobs=4, n_neighbors=6)
-Best score:  0.9835416993884458
+    Best params: {'metric': 'manhattan',
+              'n_jobs': 4,
+              'n_neighbors': 6,
+              'weights': 'uniform'}
+    Best score:  0.9835416993884458
 \end{verbatim}
 
 Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobijen model na test podacima(podaci koje model nije jos uvek video) i da vidimo kolika će biti uspešnost modela.
-
+\clearpage
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.6\textwidth]{knn_classification_result.png}
@@ -451,6 +456,85 @@ Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobi
 
 Korišćenjem unakrsne validacije i grid pretrage možemo dobiti značajnije rezultate u poređenju sa našim originalnim deljenjem trening/test sa minimalnim podešavanjima. Unakrsna validacija je veoma važna metoda koja se koristi za kreiranje bolje prilagođenih modela obukom i testiranjem na svim delovima skupa podataka za obuku.
 Iako unakrsna validacija može znatno koristiti razvoju modela, takođe postoji važna mana koja treba uzeti u obzir prilikom sprovođenja unakrsne validacije. Zbog toga što svaka iteracija modela, do k puta, zahteva da pokrenete ceo model, može postati računski skupo kako vaš skup podataka postaje veći i kako vrednost 'k' raste.
+
+\subsection{Slučajna šuma}
+Metod slučcajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja.
+Ansambl(skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa
+za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa
+za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup
+ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako
+bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku
+agregacijom.
+
+Slučajne šume su jedan od najprimenjenijih algoritama mašinskog učenja.
+Njihovo obučavanje je relativno efikasno, a preciznost predvidanja obično među
+najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume suČ zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage.
+
+\subsubsection{Treniranje modela}
+Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na
+trening i test skupove. Korišćenje slučajne šume obično ne zahteva skaliranje podataka. Algoritmi za slučajne šume, kao i drugi algoritmi bazirani na stablima odluke, nisu osetljivi na skalu ili distribuciju podataka.
+
+Prvo ćemo da kreiramo model sa podrazumevanim parametrima.Uspešnost modela iznosi u ovom slučaju iznosi 0.998528.
+
+\subsubsection{Optimizacija modela}
+Hiperparametri se koriste u slučajnim šumama da bi se poboljšale performanse i prediktivna moć modela ili da bi model bio brži.
+Hiperparametri na koje smo se odlučili da se fokusiramo su:
+\begin{itemize}
+    \item n\textunderscore estimators - broj stabala u šumi
+    \item max\textunderscore features - maksimalan broj atributa korišćenih pri podeli čvora, obično manji od broja atributa u skupu podataka
+    \item max\textunderscore depth - maksimalan broj nivoa u svakom stablu odluke
+    \item min\textunderscore samples\textunderscore split - minimalan broj podataka u čvoru pre nego što se čvor podeli
+    \item min\textunderscore samples\textunderscore leaf - minimalan broj podataka dozvoljen u listu
+    \item criterion - funkcija za merenje kvaliteta podele
+\end{itemize}
+
+Postoji nekoliko tehnika optimizacije hiperparametara za algoritam slučajne šume, kao što su grid pretraga, Bajesova optimizacija ili nasumična pretraga. Za razliku od grid pretrage, za podešavanje hiperparametara zasnovano na nasumičnoj pretrazi se ne koriste svi atributi. Grid pretraga iscrpno pretražuje svaku kombinaciju dobro definisanih vrednosti hiperparametara, što značajno povećava vreme obrade. Međutim, nasumična pretraga uzima uzorak konstantne veličine konfiguracija atributa određenih raspodelom njihovih vrednosti. Korišćenje nasumične pretrage omogućava pronalaženje raznovrsnije regije hiperparametara. Iako ne garantuje pronalaženje hiperparametara koji čine najbolju kombinaciju, dovoljno je dobra da brzo postigne vrlo dobru kombinaciju, što je posebno važno kada se radi sa skupovima podataka u astronomiji, gde obično postoji veliki broj opservacija, što generiše značajno vreme obrade.
+
+Izvršili smo nasumičnu pretragu parametara koristeći unakrsnu validaciju (cv=10), kroz 100 različitih kombinacija (n\textunderscore iter=100), i sa svim dostupnim jezgrima istovremeno (n\textunderscore jobs=-1). Nasumična pretraga nasumično bira kombinaciju atributa umesto iteriranja kroz svaku moguću kombinaciju. Veći n\textunderscore iter i cv rezultiraju većim brojem kombinacija i manjom mogućnošću prekomernog prilagođavanja. U svakoj iteraciji, algoritam će odabrati različitu kombinaciju atributa.
+
+\subsubsection{Rezultati}
+Najbolji parametri koji su dobijeni nasumičnom pretragom
+\begin{verbatim}
+    {
+     'n_estimators': 100,
+     'min_samples_split': 5,
+     'min_samples_leaf': 2,
+     'max_features': None,
+     'max_depth': 15,
+     'criterion': 'entropy'
+    }
+\end{verbatim}
+
+Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobijen model na test podacima(podaci koje model nije jos uvek video) i da vidimo kolika će biti uspešnost modela.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{random_forest.png}
+    \caption{Rezultati Slucajne sume na test skupo}
+    \label{fig:random_forest}
+\end{figure}
+
+\clearpage
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{random_forest_cm.png}
+    \caption{Matrica konfuzije za Slucajnu sumu na test skupu}
+    \label{fig:random_forest_cm}
+\end{figure}
+
+Primećujemo poboljšanje u performansama modela; dok je tačnost sa podrazumevanim parametrima bila 0.99852, ona je porasla na 0.99876 nakon optimizacije.
+
+
+
+Još jedna od dobrih karakteristika slučajne šume jeste što možemo da odredimo važnost svakog pojedinačnog atributa.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{feature_importance.png}
+    \caption{Važnost atributa}
+    \label{fig:feature_importance}
+\end{figure}
+Crveni pomak je najvažnija karakteristika od svih, jer informiše o udaljenosti i brzini entiteta u odnosu na Zemlju. Crveni pomak se dešava kada svetlost izgleda pomerena ka dužim, odnosno crvenijim, talasnim dužinama, uzrokovano Doplerovim efektom, ili fenomenom u kojem opažena talasna dužina zavisi od kretanja posmatranog objekta u odnosu na posmatrača.
+Zvezde pokazuju minimalan crveni pomak, jer su relativno blizu Zemlji i ne kreću se značajnim brzinama. Galaksije pokazuju značajne crvene pomake, zbog svog kretanja udaljavanjem od Zemlje usled širenja univerzuma.
 
 \section{Zaključak}
 
