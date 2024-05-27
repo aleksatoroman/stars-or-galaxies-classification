@@ -43,18 +43,18 @@ Za analizu podataka i implementaciju klasifikacionih algoritama korišćene su s
 
 
 \section{Podaci i Pretprocesiranje}
-U ovom istraživanju razmatrana su dva različita skupa podataka: jedan sa SuperCOSMOS Sky Survey sajta i drugi sa Sloan Digital Sky Survey sajta. U nastavku ćemo opisati način prikupljanja, učitavanja i pretprocesiranja podataka za oba skupa.
+U ovom istraživanju razmatrana su dva različita skupa podataka: jedan sa SuperCOSMOS Sky Survey sajta i drugi sa Sloan Digital Sky Survey sajta. U nastavku ćemo opisati način prikupljanja, učitavanja i pretprocesiranja podataka za oba skupa, dok zaključke do kojih smo došli u ovom postupku ćemo iskoristiti da izaberemo jedan skup i da nad njim pravimo modele za klasifikaciju nebeskih tela.
 
 \subsection{SuperCOSMOS Sky Survey}
-Podaci sa SuperCOSMOS Sky Survey sajta prikupljeni su korišćenjem dostupnih pretraga i alata za ekstrakciju podataka dostupnih na zvanicnom sajtu. Originalno, skup podataka je sadržao 901,322 redova i 43 atributa, međutim deo atributa koji je bio bitan za proces klasifikacije je imao određene nedostatke.
+Podaci sa SuperCOSMOS Sky Survey sajta prikupljeni su korišćenjem dostupnih pretraga i alata za ekstrakciju podataka dostupnih na zvaničnom sajtu. Originalno, skup podataka je sadržao 901,322 redova i 43 atributa, međutim deo atributa koji je bio bitan za proces klasifikacije je imao određene nedostatke.
 
 Tokom pretprocesiranja podataka identifikovano je nekoliko značajnih problema:
 \begin{itemize}
     \item \textbf{Magnituda}: Mnoge vrednosti za magnitude (u, g, r, i, z) su bile prazne ili su imale placeholder vrednosti koje su bile velike cifre, što je indiciralo nedostatak stvarnih podataka ili prisustvo grešaka. Ove vrednosti su morale biti odstranjene pre dalje analize.
-    \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) su bile vrlo slične za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage.
+    \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) su bile vrlo slične za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage. Ovaj nedostatak bi možda uticao da se ne vide određeni šabloni u raspodeli zvezda i galaksija na osnovu njihovih lokacija.
 \end{itemize}
 
-Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 1,000,000 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i prisustva placeholder-a koji su značajno umanjili kvalitet podataka.
+Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 1,000,000 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder-a koji su značajno umanjili kvalitet podataka.
 
 \subsection{Sloan Digital Sky Survey}
 Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita na njihovom data centru. Upit je konstruisan kako bi se dohvatili svi potencijalno relevantni atributi za vizualizaciju i treniranje klasifikacionog modela.
@@ -172,7 +172,7 @@ Prvo što želimo da uradimo, želimo da proverimo koji je odnos klasa koje imam
 \label{fig:sql_query}
 \end{figure}
 
-Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo provobitno trenirati nad svim instancama.
+Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo trenirati nad svim dostupnim instancama.
 
 \subsubsection{Prostorni raspored nebeskih tela}
 
@@ -213,16 +213,23 @@ Na grafikonu su prikazane korelacije između atributa za zvezde (desno) i galaks
 \subsection{Priprema podataka za treniranje modela}
 Za uspešno treniranje i evaluaciju klasifikacionih modela, skup podataka je podeljen na tri dela: trening skup, validacioni skup i test skup. Ovaj pristup omogućava pravilnu procenu performansi modela i njegovu generalizaciju na nove podatke.
 
-\subsubsection{Podela Skupa Podataka}
 Skup podataka je podeljen na sledeći način:
 \begin{itemize}
     \item \textbf{Trening Skup (Training Set)}: Ovaj skup podataka se koristi za treniranje modela. Model uči obrasce i veze između atributa na osnovu ovog skupa.
-    \item \textbf{Validacioni Skup (Validation Set)}: Ovaj skup se koristi za validaciju modela tokom procesa treniranja. Validacioni skup omogućava podešavanje hiperparametara modela i sprečavanje preprilagođavanju modela. Ukoliko bismo izbacili ovaj skup, onda bismo evaluaciju modela radili na testnim podacima i ukoliko se ispostavi da su rezultati loši i da parametri algoritma moraju da se menjaju, značilo bi da model prilagođavamo testnim podacima koji bi trebali da ostanu "skriveni" sve do samog kraja.
-    \item \textbf{Test Skup (Test Set)}: Ovaj skup se koristi za konačnu evaluaciju modela nakon što je treniran i validiran. Test skup pruža nezavisnu procenu performansi modela na novim, nepoznatim podacima.
+    \item \textbf{Test Skup (Test Set)}: Ovaj skup se koristi za konačnu evaluaciju modela nakon što je treniran. Test skup pruža nezavisnu procenu performansi modela na novim, nepoznatim podacima.
 \end{itemize}
 
-Podaci su podeljeni tako da trening skup čini 60\% ukupnih podataka, validacioni skup 20\%, i test skup preostalih 20\%. Ova podela je odabrana kako bi se osiguralo da ima dovoljno podataka za treniranje modela, ali i dovoljno za validaciju i testiranje.\\
-Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.
+Podaci su podeljeni tako da trening skup čini 75\% ukupnih podataka, i test skup preostalih 25\%. Ova podela je odabrana kako bi se osiguralo da ima dovoljno podataka za treniranje modela, ali i dovoljno za testiranje.\\\\
+Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.\\\\
+Treba napomenuti da nismo unapred definisali i odredili validacioni skup, koji bismo koristili za korigovanje različitih hiperparametara kod različitih klasifikacionih algoritama. Umesto toga, koristili smo kros validaciju (cross-validation) kako bismo evaluirali performanse modela i optimizovali hiperparametre.
+
+\subsubsection{Kros Validacija}
+Kros validacija je tehnika koja se koristi za procenu performansi modela i osiguravanje njegove generalizacije na nezavisnim skupovima podataka. U ovoj tehnici, podaci se dele na $k$ podskupova (ili foldova). Model se trenira na $k-1$ podskupovima, a validira se na preostalom podskupu. Ovaj proces se ponavlja $k$ puta, tako da svaki podskup bude korišćen kao validacioni barem jednom. Na kraju, rezultati svih iteracija se agregiraju kako bi se dobila pouzdana procena performansi modela.\\\\
+Korišćenjem kros validacije, postigli smo nekoliko stvari:
+\begin{itemize}
+    \item \textbf{Optimizaciju hiperparametara}: Kros validacija omogućava efikasno podešavanje hiperparametara modela bez potrebe za unapred definisanim validacionim skupom, što može povećati tačnost modela.
+    \item \textbf{Bolju generalizaciju}: Kros validacija pomaže da se model generalizuje bolje na nezavisnim podacima jer koristi različite podskupove za treniranje i validaciju.
+\end{itemize}
 
 \subsubsection{Skaliranje Podataka}
 Skaliranje podataka je ključan korak u pripremi podataka za treniranje modela. Podaci su standardizovani tako da imaju srednju vrednost 0 i standardnu devijaciju 1. Ovo je važno jer određeni algoritmi klasifikacije zahtevaju skalirane podatke kako bi se izbeglo da atributi sa većim opsegom vrednosti postanu automatski važniji od ostalih atributa. Skaliranje osigurava da svi atributi imaju jednaku težinu prilikom treniranja modela.\\\\
@@ -348,7 +355,7 @@ Ova greška može biti značajna u određenim aplikacijama, čime stabla odlčiv
 KNN(K-nearest neighbors= ili k-najbližih suseda je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom slučaju mi ćemo ga koristiti za klasifikaciju. Klasifikacija najbližih suseda je deo opšte tehnike poznate kao učenje zasnovano na instancama, koja ne gradi globalni model, već koristi primere iz treniranja za pravljenje predikcija za test instance. (Stoga se za takve klasifikatore često kaže da su "bez modela.") Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koristi za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje, Menhetn rastojanje...
 
 \subsubsection{Normalizacija i podela podataka}
-Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na trening i test skupove. Kod k najbližih suseda neophodno je da su podaci normalizocani, zato što algoritam koristi meri udaljenost između tačaka.
+Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na trening i test skupove. Kod k najbližih suseda neophodno je da su podaci normalizovani, zato što algoritam koristi meru za udaljenost između tačaka.
 Podatke treba normalizovati nakon što ih podelimo na trening i test skupove. Ovo je da bi se sprečilo "curenje podataka" jer bi normalizacija dala modelu dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom.
 
 \subsubsection{Prilagođavanje i evaluacija modela}
@@ -389,9 +396,9 @@ Vizualizujmo sad performanse modela za različite vrednosti k na trening podacim
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.6\textwidth]{knn_accuracy_vs_k.png}
+\includegraphics[width=0.6\textwidth]{knn_accuracy_vs_knn.png}
 \caption{Odnos performansi modela i broja suseda}
-\label{fig:knn_accuracy_vs_k}
+\label{fig:knn_accuracy_vs_knn}
 \end{figure}
 
 Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
@@ -430,9 +437,9 @@ Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobi
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.6\textwidth]{knn_best_est_result.png}
+\includegraphics[width=0.6\textwidth]{knn_classification_result.png}
 \caption{Rezultati KNN modela na test skupu}
-\label{fig:knn_best_est_result}
+\label{fig:knn_classification_result}
 \end{figure}
 
 \begin{figure}[h!]
