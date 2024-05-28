@@ -54,7 +54,7 @@ Tokom pretprocesiranja podataka identifikovano je nekoliko značajnih problema:
     \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) su bile vrlo slične za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage. Ovaj nedostatak bi možda uticao da se ne vide određeni šabloni u raspodeli zvezda i galaksija na osnovu njihovih lokacija.
 \end{itemize}
 
-Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 1,000,000 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder-a koji su značajno umanjili kvalitet podataka.
+Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 901,322 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder-a koji su značajno umanjili kvalitet podataka.
 
 \subsection{Sloan Digital Sky Survey}
 Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita na njihovom data centru. Upit je konstruisan kako bi se dohvatili svi potencijalno relevantni atributi za vizualizaciju i treniranje klasifikacionog modela.
@@ -74,7 +74,7 @@ Pretprocesiranje podataka sa SDSS sajta pokazalo je znatno manji broj nedostaju�
 
 
 \subsubsection{Učitavanje podataka}
-Podaci su učitani korišćenjem biblioteke pandas, koja je moćan alat za manipulaciju i analizu podataka u Pythonu. Nakon učitavanja, proverili smo da li je skup podataka uspešno dovučen i uradili smo osnovne operacije za pregled podataka i njegove statistike. Takođe u ovom procesu su i isključene kolone koje nisu potrebne za dalju analizu i treniranje modela za klasifikaciju (više o ovome u narednoj sekciji):
+Podaci su učitani korišćenjem biblioteke pandas, koja je moćan alat za manipulaciju i analizu podataka u Pythonu. Nakon učitavanja, proverili smo da li je skup podataka uspešno dovučen i uradili smo osnovne operacije za pregled podataka i njegove statistike. Takođe u ovom procesu su i isključene kolone koje nisu potrebne za dalju analizu i treniranje modela za klasifikaciju (više o izboru atributa u narednoj sekciji):
 
 \begin{figure}[h!]
 \centering
@@ -124,57 +124,35 @@ Korišćenjem ovog pristupa, uspeli smo da identifikujemo i uklonimo outlier-e i
 \label{fig:sql_query}
 \end{figure}
 
-\subsection{Odabrani atributi za treniranje modela}
+\subsection{Odabir atributa za treniranje modela}
 
-Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'dec', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift', kao i izračunati atributi 'color\_u\_g', 'color\_g\_r', 'color\_r\_i', 'color\_i\_z'. Ovi atributi su pažljivo odabrani na osnovu njihove relevantnosti u astrofizici i njihove sposobnosti da pomognu u razlikovanju zvezda i galaksija.
+Postupak odabira atributa je podrazumevao prvo razumevanje i značenje svakog od atributa, nakon toga koriščenje različitih grafičkih prezentacija koje bi nam pomogle da unapred zaključimo koji podaci bi mogli da budu značajni prilikom treniranja modela.\\\\
+
+\subsubsection{Odstranivanje nepotrebnih atributa}
+
+Za početak bez ikakve dodatne analize mogli smo da odstranimo neke atribute samo na osnovu njihovog značenja.
+\\\\Atributi kao što su 'objid', 'run' i 'rerun' odnose se na administraciju podataka i nisu direktno bitni za izradu samog klasifikacionog modela.
+\\\\Atributi 'camcol', 'field', 'plate' i 'fiberid' predstavljaju tehničke podatke koji se odnose na uslove pod kojima je snimljen nebeski objekat.
+\\\\Atribut 'mjd' predstavlja modifikovani Julianov datum posmatranja i nije relevantan za određivanje da li je objekat zvezda ili galaksija.
+
+\subsubsection{Izračunati atributi}
+
+U razmatranje smo takođe uzeli u obzir i atribute koji nisu direktno dostupni u samom skupu podataka, ali se mogu izračunati i imaju određeno značenje u konkretnom domenu. Takvi atributi u našem slučaju su takozvani 'colour-indexes'.
+\\\\Ovi atributi su izračunati na osnovu magnituda i predstavljaju razliku između sjaja u različitim delovima spektra. Oni pružaju dodatne informacije o karakteristikama nebeskih objekata.
+        \begin{itemize}
+            \item \textbf{color\_u\_g}: Razlika između magnituda u ultraljubičastom (u) i zelenom (g) delu spektra: $color\_u\_g = u - g$.
+            \item \textbf{color\_g\_r}: Razlika između magnituda u zelenom (g) i crvenom (r) delu spektra: $color\_g\_r = g - r$.
+            \item \textbf{color\_r\_i}: Razlika između magnituda u crvenom (r) i bliskom infracrvenom (i) delu spektra: $color\_r\_i = r - i$.
+            \item \textbf{color\_i\_z}: Razlika između magnituda u bliskom infracrvenom (i) i dalekom infracrvenom (z) delu spektra: $color\_i\_z = i - z$.
+        \end{itemize}
+
+\subsubsection{RA & DEC}
 
 \begin{itemize}
     \item \textbf{RA (Right Ascension)}: Ovo je jedna od dve osnovne nebeske koordinate koje se koriste za određivanje položaja nebeskih objekata na nebeskoj sferi. RA se meri u satima, minutima i sekundama, i predstavlja ugaonu udaljenost objekta istočno od Prolećne tačke. RA je ekvivalent geografskoj dužini na Zemlji.
     
     \item \textbf{DEC (Declination)}: Druga osnovna nebeska koordinata koja se koristi za određivanje položaja objekata na nebeskoj sferi. DEC se meri u stepenima, minutima i sekundama, i predstavlja ugaonu udaljenost objekta severno ili južno od nebeskog ekvatora. DEC je ekvivalent geografskoj širini na Zemlji.
-    
-    \item \textbf{Magnituda (u, g, r, i, z)}: Magnituda je mera sjaja nebeskog objekta viđenog sa Zemlje. Postoji pet filtera (u, g, r, i, z) koji mere sjaj u različitim delovima elektromagnetnog spektra:
-    \begin{itemize}
-        \item \textbf{u (ultraljubičasti filter)}: Mera sjaja u ultraljubičastom delu spektra.
-        \item \textbf{g (zeleni filter)}: Mera sjaja u zelenom delu spektra.
-        \item \textbf{r (crveni filter)}: Mera sjaja u crvenom delu spektra.
-        \item \textbf{i (bliski infracrveni filter)}: Mera sjaja u bliskom infracrvenom delu spektra.
-        \item \textbf{z (daleki infracrveni filter)}: Mera sjaja u dalekom infracrvenom delu spektra.
-    \end{itemize}
-
-        \item \textbf{Colour-indexes}: Ovi atributi su izračunati na osnovu magnituda i predstavljaju razliku između sjaja u različitim delovima spektra. Oni pružaju dodatne informacije o karakteristikama nebeskih objekata.
-    \begin{itemize}
-        \item \textbf{color\_u\_g}: Razlika između magnituda u ultraljubičastom (u) i zelenom (g) delu spektra: $color\_u\_g = u - g$.
-        \item \textbf{color\_g\_r}: Razlika između magnituda u zelenom (g) i crvenom (r) delu spektra: $color\_g\_r = g - r$.
-        \item \textbf{color\_r\_i}: Razlika između magnituda u crvenom (r) i bliskom infracrvenom (i) delu spektra: $color\_r\_i = r - i$.
-        \item \textbf{color\_i\_z}: Razlika između magnituda u bliskom infracrvenom (i) i dalekom infracrvenom (z) delu spektra: $color\_i\_z = i - z$.
-    \end{itemize}
-    
-    \item \textbf{Class (klasa)}: Ovaj atribut označava klasifikaciju objekta kao zvezda ili galaksija. Ovo je ciljna promenljiva u klasifikacionom modelu.
-    
-    \item \textbf{Redshift}: Crveni pomak je ključan fenomen u astronomiji jer omogućava određivanje udaljenosti i brzine udaljavanja nebeskih objekata, što je posebno važno za klasifikaciju između zvezda i galaksija. Razumevanje crvenog pomaka pomaže u identifikaciji galaksija koje se udaljavaju od nas zbog širenja svemira, dok zvezde, sa svojim karakterističnim relativnim brzinama unutar naše galaksije, pružaju dodatne informacije o njihovim kretanjima i položajima u odnosu na Sunčev sistem.
 \end{itemize}
-
-Atributi kao što su 'objid', 'run' i 'rerun' odnose se na administraciju podataka i nisu direktno bitni za izradu samog klasifikacionog modela. Atributi 'camcol', 'field', 'plate' i 'fiberid' predstavljaju tehničke podatke koji se odnose na uslove pod kojima je snimljen nebeski objekat. Atribut 'mjd' predstavlja modifikovani Julianov datum posmatranja i nije relevantan za određivanje da li je objekat zvezda ili galaksija.\\\\
-Odabir ovih atributa omogućava modelima da imaju dovoljno informacija za preciznu klasifikaciju nebeskih objekata. RA i DEC pružaju informacije o položaju objekta na nebu, magnitude u različitim filterima omogućavaju analizu sjaja objekta u različitim delovima spektra, klasa objekta je cilj klasifikacije, dok crveni pomak pruža dodatne informacije o udaljenosti i brzini objekta.
-
-\clearpage
-
-\subsection{Vizualizacija podataka}
-
-\subsubsection{Odnos broja instanci različitih klasa}
-Prvo što želimo da uradimo, želimo da proverimo koji je odnos klasa koje imamo u našem skupu podataka.
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{class_count_result.png}
-\caption{Odnos klasa u skupu podataka}
-\label{fig:sql_query}
-\end{figure}
-
-Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo trenirati nad svim dostupnim instancama.
-
-\subsubsection{Prostorni raspored nebeskih tela}
 
 \begin{figure}[h!]
 \centering
@@ -191,9 +169,21 @@ Sledeći grafikon prikazuje prostorni raspored zvezda i galaksija u ekvatorijaln
     \item Gustinski graf na desnoj strani pokazuje da postoji razlika u raspodeli zvezda i galaksija duž deklinacije, što može pomoći u daljem istraživanju i klasifikaciji objekata.
 \end{itemize}
 
-\subsubsection{Korelaciona matrica}
+\subsubsection{Magnituda}
 
-Korelaciona matrica je vizualni prikaz koji prikazuje međusobnu povezanost različitih atributa korišćenih u skupu podataka. Sledeći grafikon prikazuje korelacionu matricu za atribute zvezda i galaksija, omogućavajući nam da identifikujemo koje atribute imaju jaku ili slabu korelaciju.
+Magnituda je mera sjaja nebeskog objekta viđenog sa Zemlje. Postoji pet filtera (u, g, r, i, z) koji mere sjaj u različitim delovima elektromagnetnog spektra:
+
+\begin{itemize}
+    \item \textbf{u (ultraljubičasti filter)}: Mera sjaja u ultraljubičastom delu spektra (354 nm).
+    \item \textbf{g (zeleni filter)}: Mera sjaja u zelenom delu spektra (476 nm).
+    \item \textbf{r (crveni filter)}: Mera sjaja u crvenom delu spektra (628 nm).
+    \item \textbf{i (bliski infracrveni filter)}: Mera sjaja u bliskom infracrvenom delu spektra (769 nm).
+    \item \textbf{z (daleki infracrveni filter)}: Mera sjaja u dalekom infracrvenom delu spektra (925 nm).
+\end{itemize}
+Značaj magnituda može se uočiti kroz prikaz odgovarajuće korelacione matrice za ove atribute.
+\\\\Korelaciona matrica je vizualni prikaz koji pokazuje međusobnu povezanost različitih atributa korišćenih u skupu podataka.
+
+\clearpage
 
 \begin{figure}[h!]
 \centering
@@ -202,18 +192,67 @@ Korelaciona matrica je vizualni prikaz koji prikazuje međusobnu povezanost razl
 \label{fig:correlation_matrix}
 \end{figure}
 
-Na grafikonu su prikazane korelacije između atributa za zvezde (desno) i galaksije (levo).
+Na grafikonu su prikazane korelacije između magnituda za zvezde (desno) i galaksije (levo).
+\\\\Na prvi pogled možemo primetiti da su korelacione matrice veoma slične za obe klase (zvezde i galaksije).
+\\\\Možemo zaključiti da postoje visoke korelacije između različitih opsega. Ovo nije iznenađujuće; intuitivno, očekivali bismo da ako jedan opseg zabeleži svetlost nekog objekta, i ostali opsezi bi trebali zabeležiti svetlost.
+\\\\Međutim, interesantno je primetiti da je opseg u manje povezan sa ostalim opsezima. Ovo je u skladu sa činjenicom da opsezi u, g, r, i, z zabeležavaju svetlost na talasnim dužinama od 354, 476, 628, 769 i 925 nm, redom.
+\\\\Ovo može ukazivati da galaksije i zvezde sjaje jače na talasnim dužinama od 476 do 925 nm. Ipak, treba biti oprezan sa ovakvim interpretacijama.
+\\\\Generalno, korelacije su približno iste za obe klase, što sugeriše da se različiti opsezi ponašaju slično za zvezde i galaksije.
+
+
+\subsubsection{Redshift}
+Crveni pomak je ključan fenomen u astronomiji jer omogućava određivanje udaljenosti i brzine udaljavanja nebeskih objekata, što je posebno važno za klasifikaciju između zvezda i galaksija. Razumevanje crvenog pomaka pomaže u identifikaciji galaksija koje se udaljavaju od nas zbog širenja svemira, dok zvezde, sa svojim karakterističnim relativnim brzinama unutar naše galaksije, pružaju dodatne informacije o njihovim kretanjima i položajima u odnosu na Sunčev sistem.
+
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1.0\textwidth]{redshift_hist.png}
+\caption{Histogram crvenog pomaka za zvezde i galaksije}
+\label{fig:redshift_hist}
+\end{figure}
+
+Na slici \ref{fig:redshift_hist} prikazan je histogram crvenog pomaka za zvezde (desno) i galaksije (levo). Iz ovog histograma možemo zaključiti nekoliko važnih činjenica:
 
 \begin{itemize}
-    \item \textbf{RA i DEC}: Vrednosti RA (Right Ascension) i DEC (Declination) imaju vrlo slabu korelaciju sa ostalim atributima. Ovo je očekivano jer su RA i DEC prostorne koordinate koje ne zavise direktno od fizičkih svojstava objekata kao što su magnitude i redshift.
-    \item \textbf{Magnituda}: Magnitude u različitim filterima (u, g, r, i, z) pokazuju jaku pozitivnu korelaciju međusobno. Ovo znači da objekti koji su svetli u jednom filteru imaju tendenciju da budu svetli i u ostalim filterima.
-    \item \textbf{Redshift}: Redshift pokazuje umereno pozitivnu korelaciju sa magnitudama. Ovo je logično jer objekti sa većim redshiftom (udaljeniji objekti) obično imaju drugačiji sjaj zbog kosmoloških efekata.
+    \item \textbf{Galaksije}: 
+    \begin{itemize}
+        \item Crveni pomak galaksija varira u širokom rasponu, od 0 do preko 2.0.
+        \item Većina galaksija ima crveni pomak između 0.0 i 1.0, sa vrhom distribucije oko 0.5.
+        \item Ovaj široki raspon crvenog pomaka potvrđuje da se galaksije udaljavaju različitim brzinama, što je u skladu sa Hablovim zakonom koji kaže da je brzina udaljavanja galaksija proporcionalna njihovoj udaljenosti od nas.
+    \end{itemize}
+    \item \textbf{Zvezde}: 
+    \begin{itemize}
+        \item Crveni pomak zvezda je veoma koncentrisan oko nule, sa većinom vrednosti između -0.004 i 0.004.
+        \item Ova koncentracija oko nule ukazuje na to da se zvezde unutar naše galaksije kreću relativno malim brzinama u poređenju sa galaksijama, te se njihov crveni pomak uglavnom javlja zbog njihovih orbitalnih kretanja unutar naše galaksije.
+    \end{itemize}
 \end{itemize}
+Crveni pomak može se koristiti kao procena udaljenosti objekta od Zemlje. Na osnovu histograma, većina posmatranih zvezda je bliža Zemlji nego galaksije. Galaksije su generalno dalje, što se može objasniti time da galaksije, zbog svoje veličine i fizičke strukture, emituju jače zračenje i mogu se posmatrati sa većih udaljenosti nego 'male' zvezde.
+\\\\Kako možemo razlikovati klase objekata na osnovu kolone 'crveni pomak', ovaj atribut će verovatno biti od velike pomoći u klasifikaciji novih objekata.
+
+\subsubsection{Class (klasa)}
+Ovaj atribut označava klasifikaciju objekta kao zvezda ili galaksija. Ovo je ciljna promenljiva u klasifikacionom modelu.
+
+\subsubsection{Zaključak}
+Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'dec', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift', kao i izračunati atributi 'color\_u\_g', 'color\_g\_r', 'color\_r\_i', 'color\_i\_z'.
+
+\clearpage
+
 
 \subsection{Priprema podataka za treniranje modela}
-Za uspešno treniranje i evaluaciju klasifikacionih modela, skup podataka je podeljen na tri dela: trening skup, validacioni skup i test skup. Ovaj pristup omogućava pravilnu procenu performansi modela i njegovu generalizaciju na nove podatke.
 
-Skup podataka je podeljen na sledeći način:
+Prvo što želimo da uradimo, želimo da proverimo koji je odnos klasa koje imamo u našem skupu podataka.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{class_count_result.png}
+\caption{Odnos klasa u skupu podataka}
+\label{fig:sql_query}
+\end{figure}
+
+Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo trenirati nad svim dostupnim instancama.
+\\\\Za uspešno treniranje i evaluaciju klasifikacionih modela, skup podataka je podeljen na tri dela: trening skup, validacioni skup i test skup. Ovaj pristup omogućava pravilnu procenu performansi modela i njegovu generalizaciju na nove podatke.
+\\\\Skup podataka je podeljen na sledeći način:
 \begin{itemize}
     \item \textbf{Trening Skup (Training Set)}: Ovaj skup podataka se koristi za treniranje modela. Model uči obrasce i veze između atributa na osnovu ovog skupa.
     \item \textbf{Test Skup (Test Set)}: Ovaj skup se koristi za konačnu evaluaciju modela nakon što je treniran. Test skup pruža nezavisnu procenu performansi modela na novim, nepoznatim podacima.
