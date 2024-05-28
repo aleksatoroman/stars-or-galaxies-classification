@@ -273,14 +273,14 @@ Korišćenjem unakrsne validacije, postigli smo nekoliko stvari:
 \label{fig:cross_validation}
 \end{figure}
 
-\subsubsection{Skaliranje Podataka}
+\subsubsection{Skaliranje podataka}
 Skaliranje podataka je ključan korak u pripremi podataka za treniranje modela. Podaci su standardizovani tako da imaju srednju vrednost 0 i standardnu devijaciju 1. Ovo je važno jer određeni algoritmi klasifikacije zahtevaju skalirane podatke kako bi se izbeglo da atributi sa većim opsegom vrednosti postanu automatski važniji od ostalih atributa. Skaliranje osigurava da svi atributi imaju jednaku težinu prilikom treniranja modela.\\\\
 Skaliranje podataka je takođe značajno za mnoge optimizacione algoritme, kao što je gradijentni spust, jer doprinosi bržoj konvergenciji i stabilnijem učenju modela. Standardizacija podataka omogućava algoritmima da efikasnije pretražuju prostor rešenja, što rezultira boljim performansama i bržim treniranjem.
 Još jedna bitna napomena jeste da podatke treba normalizovati nakon što ih podelimo na trening i test skupove kako bismo sprečili 'curenje podataka' koje bi modelu dalo dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom, a podelu podataka izvršili naknadno.
 
-\section{Klasifikacioni Algoritmi}
+\section{Klasifikacioni algoritmi}
 
-\subsection{Metrike za Evaluaciju Modela}
+\subsection{Metrike za evaluaciju modela}
 Za evaluaciju performansi klasifikacionih modela korišćene su sledeće metrike: tačnost (accuracy), preciznost (precision), odziv (recall), F1-score i podrška (support). Ove metrike omogućavaju sveobuhvatnu procenu kvaliteta modela i njegove sposobnosti da tačno klasifikuje nebeske objekte kao zvezde ili galaksije.\\
 Važno je napomenuti da je skup podataka neuravnotežen, sa većim brojem galaksija u odnosu na zvezde. U ovakvim situacijama, određene metrike, kao što su F1-score i odziv, postaju posebno važne za procenu performansi modela.
 
@@ -367,7 +367,7 @@ Za treniranje modela korišćen je skup podataka koji je prethodno podeljen na t
 
 Kako bismo dodatno poboljšali kvalitet modela i smanjili varijansu, korišćena je unakrsna validacija.
 
-\subsubsection{Rezultati Unakrsne Validacije}
+\subsubsection{Rezultati unakrsne validacije}
 Prosečna tačnost modela procenjena unakrsnom validacijom je pokazala visok nivo tačnosti, sa malim standardnim odstupanjem, što ukazuje na konzistentne performanse modela.
 
 \begin{verbatim}
@@ -530,7 +530,7 @@ Možemo primetiti da je redshift najvažniji atribut od svih kao što smo i pret
 \subsection{Naive Bayes (Gaus)}
 Gaussian Naive Bayes (GNB) je algoritam za klasifikaciju zasnovan na Bayesovoj teoremi sa pretpostavkom da su karakteristike podjednako i nezavisno normalno distribuirane. Ovaj algoritam je jednostavan za implementaciju i efikasan, posebno za visoko-dimenzionalne podatke.
 
-\subsubsection{Treniranje i Evaluacija}
+\subsubsection{Treniranje i evaluacija}
 Treniranje i evaluacija Gaussian Naive Bayes modela izvedeni su korišćenjem pretrage za optimizaciju hiperparametara. Hiperparametar \textit{var\_smoothing}, koji dodaje varijansu na procene verovatnoće kako bi se stabilizovale procene, optimizovan je korišćenjem unakrsne validacije (cross-validation) sa deset preklopnih skupova (foldova).
 
 \subsubsection{Rezultati}
