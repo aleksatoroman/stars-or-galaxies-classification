@@ -392,10 +392,10 @@ Ova greška može biti značajna u određenim aplikacijama, čime stabla odlčiv
 
 \subsection{K-najbližih suseda}
 
-KNN(K-nearest neighbors= ili k-najbližih suseda je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom slučaju mi ćemo ga koristiti za klasifikaciju. Klasifikacija najbližih suseda je deo opšte tehnike poznate kao učenje zasnovano na instancama, koja ne gradi globalni model, već koristi primere iz treniranja za pravljenje predikcija za test instance. (Stoga se za takve klasifikatore često kaže da su "bez modela.") Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koristi za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje, Menhetn rastojanje...
+KNN(K-nearest neighbors= ili k-najbližih suseda je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom slučaju koristićemo ga za klasifikaciju. Klasifikacija najbližih suseda je deo opšte tehnike poznate kao učenje zasnovano na instancama, koja ne gradi globalni model, već koristi primere iz treniranja za pravljenje predikcija za test instance. (Stoga se za takve klasifikatore često kaže da su "bez modela.") Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koristi za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje, Menhetn rastojanje...
 
-\subsubsection{Normalizacija i podela podataka}
-Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na trening i test skupove. Kod k najbližih suseda neophodno je da su podaci normalizovani, zato što algoritam koristi meru za udaljenost između tačaka.
+\subsubsection{Normalizacija podataka}
+Kod k-najbližih suseda neophodno je da su podaci normalizovani, zato što algoritam koristi meru za udaljenost između tačaka.
 Podatke treba normalizovati nakon što ih podelimo na trening i test skupove. Ovo je da bi se sprečilo "curenje podataka" jer bi normalizacija dala modelu dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom.
 
 \subsubsection{Prilagođavanje i evaluacija modela}
@@ -550,21 +550,18 @@ Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobi
 \begin{figure}
     \centering
     \includegraphics[width=0.6\linewidth]{random_forest.png}
-    \caption{Rezultati Slucajne sume na test skupo}
+    \caption{Rezultati Slučajne sume na test skupo}
     \label{fig:random_forest}
 \end{figure}
 
-\clearpage
 \begin{figure}
     \centering
     \includegraphics[width=0.6\linewidth]{random_forest_cm.png}
-    \caption{Matrica konfuzije za Slucajnu sumu na test skupu}
+    \caption{Matrica konfuzije za Slučajnu sumu na test skupu}
     \label{fig:random_forest_cm}
 \end{figure}
 
 Primećujemo poboljšanje u performansama modela; dok je tačnost sa podrazumevanim parametrima bila 0.99852, ona je porasla na 0.99876 nakon optimizacije.
-
-
 
 Još jedna od dobrih karakteristika slučajne šume jeste što možemo da odredimo važnost svakog pojedinačnog atributa.
 \begin{figure}
@@ -573,8 +570,39 @@ Još jedna od dobrih karakteristika slučajne šume jeste što možemo da odredi
     \caption{Važnost atributa}
     \label{fig:feature_importance}
 \end{figure}
+
+
 Crveni pomak je najvažnija karakteristika od svih, jer informiše o udaljenosti i brzini entiteta u odnosu na Zemlju. Crveni pomak se dešava kada svetlost izgleda pomerena ka dužim, odnosno crvenijim, talasnim dužinama, uzrokovano Doplerovim efektom, ili fenomenom u kojem opažena talasna dužina zavisi od kretanja posmatranog objekta u odnosu na posmatrača.
 Zvezde pokazuju minimalan crveni pomak, jer su relativno blizu Zemlji i ne kreću se značajnim brzinama. Galaksije pokazuju značajne crvene pomake, zbog svog kretanja udaljavanjem od Zemlje usled širenja univerzuma.
+
+
+\clearpage
+
+\subsection{Naive Bayes (Gaus)}
+Gaussian Naive Bayes (GNB) je algoritam za klasifikaciju zasnovan na Bayesovoj teoremi sa pretpostavkom da su karakteristike podjednako i nezavisno normalno distribuirane. Ovaj algoritam je jednostavan za implementaciju i efikasan, posebno za visoko-dimenzionalne podatke.
+
+\subsubsection{Treniranje i Evaluacija}
+Treniranje i evaluacija Gaussian Naive Bayes modela izvedeni su korišćenjem pretrage za optimizaciju hiperparametara. Hiperparametar \textit{var\_smoothing}, koji dodaje varijansu za stabilizaciju procena, optimizovan je korišćenjem unakrsne validacije (cross-validation) sa deset preklopnih skupova (foldova).
+
+\subsubsection{Rezultati}
+Nakon optimizacije hiperparametara, Gaussian Naive Bayes model je evaluiran na test skupu podataka. Rezultati su prikazani u sledećim slikama.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{gaussian_nb_classification_report.png}
+\caption{Rezultati klasifikacije Gaussian Naive Bayes modela na test skupu}
+\label{fig:gaussian_nb_classification_report}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{gaussian_nb_cm.png}
+\caption{Matrica konfuzije za Gaussian Naive Bayes model na test skupu}
+\label{fig:gaussian_nb_cm}
+\end{figure}
+
+Rezultati pokazuju visoku tačnost i dobre sveobuhvatne metrike:
+
 
 \section{Zaključak}
 
