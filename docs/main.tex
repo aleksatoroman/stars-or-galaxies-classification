@@ -7,7 +7,7 @@
 \usepackage{geometry}
 \geometry{margin=1in}
 \usepackage{float}
-\title{Klasifikacija zvezda od galaksija korišćenjem klasifikacionih algoritama}
+\title{Klasifikacija Zvezda i Galaksija Korišćenjem Algoritama Mašinskog Učenja}
 \author{\\Aleksa Toroman 84/2018 & Milica Sudar 79/2017 \\\\ Univerzitet u Beogradu, Matematički fakultet}
 
 \begin{document}
@@ -51,10 +51,10 @@ Podaci sa SuperCOSMOS Sky Survey sajta prikupljeni su korišćenjem dostupnih pr
 Tokom pretprocesiranja ovih podataka identifikovano je nekoliko značajnih problema u samom skupu:
 \begin{itemize}
     \item \textbf{Magnitude}: Mnoge vrednosti za magnitude (u, g, r, i, z) su bile prazne ili su imale placeholder vrednosti koje su bile velike cifre, što je indiciralo nedostatak stvarnih podataka ili prisustvo grešaka. Ove vrednosti su morale biti odstranjene pre dalje analize.
-    \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) su bile vrlo slične za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage. Ovaj nedostatak bi možda uticao da se ne vide određeni šabloni u raspodeli zvezda i galaksija na osnovu njihovih lokacija.
+    \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) kao dva glavna lokacijska atributa su bila vrlo slična za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage. Ovaj nedostatak bi možda uticao da se ne vide određeni šabloni u raspodeli zvezda i galaksija na osnovu njihovih lokacija.
 \end{itemize}
 
-Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 901,322 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder vrednosti  koji su značajno umanjili kvalitet podataka.
+Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 82,880 redova za dalju analizu, što je znatno manje od originalnih 901,322 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder vrednosti  koji su značajno umanjili kvalitet podataka.
 
 \subsection{Sloan Digital Sky Survey}
 Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita u njihovom data centru. Upit je preuzet sa SDSS sajta i modifikovan tako da obuhvati podatke koji uključuju samo zvezde i galaksije, isključujući quasare kao tip nebeskih objekata.
@@ -84,7 +84,7 @@ Podaci su učitani korišćenjem biblioteke pandas, koja je moćan alat za manip
 \end{figure}
 
 \subsubsection{Identifikacija i uklanjanje anomalija}
-Proces čišćenja podataka je ključan korak u pripremi podataka za treniranje modela. Ovaj proces uključuje identifikaciju i uklanjanje anomalija i outlier-a i razrešavanje praznih vrednosti.\\\\
+Proces čišćenja podataka je ključan korak u pripremi podataka za treniranje modela. Ovaj proces uključuje identifikaciju i razrešavanje anomalija, outlier-a i praznih vrednosti. S obzirom na količinu dostupnih podataka, a imajući i u vidu osetljivost u vrednostima atributa, strategija za razrešavanje u našem scenariju je bila jednostavno odstranjivanje redova sa takvim anomalijama\\\\
 Prvo smo proverili da li skup podatak ima nedostajuće vrednosti u nekim kolonama:
 
 \begin{figure}[H]
@@ -256,14 +256,14 @@ Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zve
 
 Podaci su podeljeni tako da trening skup čini 75\% ukupnih podataka, i test skup preostalih 25\%. Ova podela je odabrana kako bi se osiguralo da ima dovoljno podataka za treniranje modela, ali i dovoljno za testiranje.\\\\
 Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.\\\\
-Treba napomenuti da nismo unapred definisali i odredili validacioni skup, koji bismo koristili za korigovanje različitih hiperparametara kod različitih klasifikacionih algoritama. Umesto toga, koristili smo kros validaciju (cross-validation) kako bismo evaluirali performanse modela i optimizovali hiperparametre.
+Treba napomenuti da nismo unapred definisali i odredili validacioni skup, koji bismo koristili za korigovanje različitih hiperparametara kod različitih klasifikacionih algoritama. Umesto toga, koristili smo unakrsnu validaciju (cross-validation) kako bismo evaluirali performanse modela i optimizovali hiperparametre.
 
 \subsubsection{Unakrsna validacija}
 Unakrsna validacija je tehnika koja se koristi za procenu performansi modela i osiguravanje njegove generalizacije na nezavisnim skupovima podataka. U ovoj tehnici, prilikom treniranja modela, trening podaci se dele na $k$ podskupova (ili foldova). Model se trenira na $k-1$ podskupovima, a validira se na preostalom podskupu. Ovaj proces se ponavlja $k$ puta, tako da svaki podskup bude korišćen kao validacioni barem jednom. Na kraju, rezultati svih iteracija se agregiraju kako bi se dobila pouzdana procena performansi modela.\\\\
-Korišćenjem kros validacije, postigli smo nekoliko stvari:
+Korišćenjem unakrsne validacije, postigli smo nekoliko stvari:
 \begin{itemize}
-    \item \textbf{Optimizaciju hiperparametara}: Kros validacija omogućava efikasno podešavanje hiperparametara modela bez potrebe za unapred definisanim validacionim skupom, što može povećati tačnost modela.
-    \item \textbf{Bolju ocenu generalizacije}: Kros validacija pomaže da se model generalizuje bolje na nezavisnim podacima jer koristi različite podskupove za treniranje i validaciju i samim tim možemo biti sigurniji da će se model ponašati slično i na testnim podacima kasnije.
+    \item \textbf{Optimizaciju hiperparametara}: Unakrsna validacija omogućava efikasno podešavanje hiperparametara modela bez potrebe za unapred definisanim validacionim skupom, što može povećati tačnost modela.
+    \item \textbf{Bolju ocenu generalizacije}: Unakrsna validacija pomaže da se model generalizuje bolje na nezavisnim podacima jer koristi različite podskupove za treniranje i validaciju i samim tim možemo biti sigurniji da će se model ponašati slično i na testnim podacima kasnije.
 \end{itemize}
 
 \begin{figure}[H]
@@ -319,12 +319,15 @@ Decision tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih a
 
 \subsubsection{Trening}
 
-Za treniranje Decision Tree modela korišćen je skup podataka koji je prethodno podeljen na trenig i test skup. Za treniranje modela nije bilo potrebno koristiti skalirane podatke, jer Decision Tree algoritmi ne zavise od udaljenosti između tačaka.
+Za treniranje Decision Tree modela korišćen je skup podataka koji je prethodno podeljen na trening i test skup. Za treniranje modela nije bilo potrebno koristiti skalirane podatke, jer Decision Tree algoritmi ne zavise od udaljenosti između tačaka.
 
-Decision Tree algoritmi imaju različite hiperparametre koji mogu uticati na kvalitet modela. Neki od tih hiperparametara uključuju maksimalnu dubinu stabla, minimalan broj uzoraka potrebnih za podelu čvora, minimalan broj uzoraka u listu i broj karakteristika koje se koriste za traženje najboljeg podele.
+Decision Tree algoritmi imaju različite hiperparametre koji mogu uticati na kvalitet modela. Neki od tih hiperparametara uključuju maksimalnu dubinu stabla, minimalan broj uzoraka potrebnih za podelu čvora, minimalan broj uzoraka u listu i broj karakteristika koje se koriste za traženje najbolje podele.
 
-Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu scikit-learn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan od parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo preciznost(accuracy). Važno je napomenuti da se ove promene hiperparametara i traženje najboljeg modela zasnivaju na evaluaciji modela u svakoj iteraciji pretrage koristeći unakrsnu validaciju kao vid validacije i evaluacije uspešnosti modela u svakoj iteraciji. Za naše modele koristi smo k=10 za broj foldova pri svakoj iteraciji. Mana ovog pristupa jeste u vremenskoj potrošnji, gde se broj 'fitova' odnosno treniranja modela računa kao broj mogučih permutacija hiperparametra * puta foldova.
-\\\\Nakon što smo odredili najbolji skup parametara, iskoristićemo ih da istreniramo model još jednom ali ovaj put ćemo uključiti ceo skup trening podataka.
+Da bismo pronašli najbolju kombinaciju hiperparametara, koristili smo GridSearchCV funkciju iz paketa scikit-learn. Ova funkcija automatski pretražuje različite kombinacije hiperparametara i procenjuje performanse modela za svaku od njih. Na ovaj način možemo identifikovati konfiguraciju hiperparametara koja daje najbolje rezultate za dati skup podataka.\\
+Jedan od parametara koji se prosleđuje GridSearchCV funkciji je metrika koja će se koristiti za procenu kvaliteta modela tokom pretrage. U našem slučaju, koristili smo tačnost (accuracy).\\
+Važno je napomenuti da GridSearchCV koristi unakrsnu validaciju (cross-validation) kako bi procenio performanse modela u svakoj iteraciji pretrage. Za naše modele smo koristili 10-fold unakrsnu validaciju, što znači da je skup podataka podeljen na 10 delova, pri čemu se model trenira 10 puta, svaki put koristeći drugačiji deo kao test skup, a preostalih 9 delova kao trening skup.\\
+Mana ovog pristupa je što može biti vremenski zahtevan, jer se broj treniranja modela (fitova) računa kao broj mogućih kombinacija hiperparametara pomnožen sa brojem foldova.\\
+Nakon što smo identifikovali najbolji skup hiperparametara, iskoristili smo ih da ponovo istreniramo model, ali ovog puta koristeći ceo trening skup podataka.
 
 \begin{figure}[H]
 \centering
@@ -356,7 +359,6 @@ Rezultati pokazuju da je model stabla odlučivanja vrlo efikasan u klasifikaciji
 Matrica konfuzije pruža dodatni uvid u rezultate evaluacije modela, prikazujući tačne i netačne klasifikacije za svaku klasu.
 \\\\Ovi rezultati potvrđuju da algoritam stabla odlučivanja može biti izuzetno efikasan za klasifikaciju nebeskih objekata, pružajući visok nivo tačnosti i pouzdanosti.
 
-\newpage
 \subsection{Logistička regresija}
 Logistička regresija (logistic regression) je popularan algoritam za binarnu klasifikaciju koji modelira verovatnoću da primerak pripada određenoj klasi. Algoritam koristi logističku funkciju za predikciju verovatnosti, a zatim klasifikuje primerke na osnovu praga verovatnoće (obično 0.5).
 
@@ -436,7 +438,6 @@ Slično kao i kod prethodnih modela, za traženje najboljeg skupa hiperparametar
 Rezultati su pokazali da je najbolja kombinacija parametara
 \begin{verbatim}
     Best params: {'metric': 'manhattan',
-              'n_jobs': 4,
               'n_neighbors': 6,
               'weights': 'uniform'}
     Best score:  0.9835416993884458
@@ -463,15 +464,13 @@ Nakon što smo odradili optimizaciju modela vreme je da pokrenemo najbolje dobij
 Vidimo da ovaj model postiže lošije rezultate u odnosu na prvobitna dva algoritma.
 
 \subsection{Slučajna šuma}
-Metod slučajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja.
-Ansambl(skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku agregacijom.
+Metod slučajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja. Ansambl (skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku agregacijom.
 \\\\Slučajne šume su jedan od najprimenjenijih algoritama mašinskog učenja.
 Njihovo obučavanje je relativno efikasno, a preciznost predvidjanja obično među
-najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume suČ zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage.
+najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume su: zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage..
 
 \subsubsection{Treniranje modela}
-Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na
-trening i test skupove. Korišćenje slučajne šume obično ne zahteva skaliranje podataka. Algoritmi za slučajne šume, kao i drugi algoritmi bazirani na stablima odluke, nisu osetljivi na skalu ili distribuciju podataka.
+Kao i kod prethodnih algoritama, koristili smo prethodno podeljene skupove za trening i test. Korišćenje slučajne šume obično ne zahteva skaliranje podataka. Algoritmi za slučajne šume, kao i drugi algoritmi bazirani na stablima odluke, nisu osetljivi na skalu ili distribuciju podataka.
 
 \subsubsection{Optimizacija modela}
 Hiperparametri se koriste u slučajnim šumama da bi se poboljšale performanse i prediktivna moć modela ili da bi model bio brži.
@@ -485,10 +484,10 @@ Hiperparametri na koje smo se odlučili da se fokusiramo su:
     \item \textbf{criterion} - funkcija za merenje kvaliteta podele
 \end{itemize}
 
-Postoji nekoliko tehnika optimizacije hiperparametara za algoritam slučajne šume, kao što su grid pretraga, Bajesova optimizacija ili nasumična pretraga. Za razliku od grid pretrage, za podešavanje hiperparametara zasnovano na nasumičnoj pretrazi se ne koriste svi atributi. Grid pretraga iscrpno pretražuje svaku kombinaciju dobro definisanih vrednosti hiperparametara, što značajno povećava vreme obrade. Međutim, nasumična pretraga uzima uzorak konstantne veličine konfiguracija atributa određenih raspodelom njihovih vrednosti. Korišćenje nasumične pretrage omogućava pronalaženje raznovrsnije regije hiperparametara. Iako ne garantuje pronalaženje hiperparametara koji čine najbolju kombinaciju, dovoljno je dobra da brzo postigne vrlo dobru kombinaciju, što je posebno važno kada se radi sa skupovima podataka u astronomiji, gde obično postoji veliki broj opservacija, što generiše značajno vreme obrade.
+Postoji nekoliko tehnika optimizacije hiperparametara za algoritam slučajne šume, kao što su grid pretraga, Bajesova optimizacija i nasumična pretraga. Za razliku od grid pretrage, za podešavanje hiperparametara zasnovano na nasumičnoj pretrazi se ne koriste sve moguće kombinacije hiperparametara. Grid pretraga iscrpno pretražuje svaku kombinaciju unapred definisanih vrednosti hiperparametara, što značajno povećava vreme obrade. Međutim, nasumična pretraga uzima uzorak konstantne veličine konfiguracija hiperparametara određenih raspodelom njihovih vrednosti. Korišćenje nasumične pretrage omogućava pronalaženje raznovrsnije regije hiperparametara. Iako ne garantuje pronalaženje hiperparametara koji čine najbolju kombinaciju, dovoljno je dobra da brzo postigne vrlo dobru kombinaciju, što je posebno važno kada se radi sa skupovima podataka u astronomiji, gde obično postoji veliki broj opservacija, što generiše značajno vreme obrade.
 
-Izvršili smo nasumičnu pretragu parametara koristeći unakrsnu validaciju (cv=10), kroz 100 različitih kombinacija (n\textunderscore iter=100), i sa svim dostupnim jezgrima istovremeno (n\textunderscore jobs=-1). Nasumična pretraga nasumično bira kombinaciju atributa umesto iteriranja kroz svaku moguću kombinaciju. Veći n\textunderscore iter i cv rezultiraju većim brojem kombinacija i manjom mogućnošću prekomernog prilagođavanja. U svakoj iteraciji, algoritam će odabrati različitu kombinaciju atributa.\\\\
-Najbolji parametri koji su dobijeni nasumičnom pretragom
+Izvršili smo nasumičnu pretragu hiperparametara koristeći unakrsnu validaciju (cv=10), kroz 100 različitih kombinacija (n\textunderscore iter=100), i sa svim dostupnim jezgrima istovremeno (n\textunderscore jobs=-1). Nasumična pretraga nasumično bira kombinaciju hiperparametara umesto iteriranja kroz svaku moguću kombinaciju. Veći n\textunderscore iter i cv rezultiraju većim brojem kombinacija i manjom mogućnošću prekomernog prilagođavanja. U svakoj iteraciji, algoritam će odabrati različitu kombinaciju hiperparametara.\\\\
+Najbolji hiperparametara koji su dobijeni nasumičnom pretragom
 \begin{verbatim}
     {
      'n_estimators': 100,
@@ -526,12 +525,13 @@ Još jedna od dobrih karakteristika slučajne šume jeste što možemo da odredi
 \end{figure}
 
 Možemo primetiti da je redshift najvažniji atribut od svih kao što smo i pretpostavili na početku na osnovu histograma.
+\\\\Takođe vidimo da do sada, ovaj klasifikacioni algoritam daje najbolje rezultate.
 
 \subsection{Naive Bayes (Gaus)}
 Gaussian Naive Bayes (GNB) je algoritam za klasifikaciju zasnovan na Bayesovoj teoremi sa pretpostavkom da su karakteristike podjednako i nezavisno normalno distribuirane. Ovaj algoritam je jednostavan za implementaciju i efikasan, posebno za visoko-dimenzionalne podatke.
 
 \subsubsection{Treniranje i Evaluacija}
-Treniranje i evaluacija Gaussian Naive Bayes modela izvedeni su korišćenjem pretrage za optimizaciju hiperparametara. Hiperparametar \textit{var\_smoothing}, koji dodaje varijansu za stabilizaciju procena, optimizovan je korišćenjem unakrsne validacije (cross-validation) sa deset preklopnih skupova (foldova).
+Treniranje i evaluacija Gaussian Naive Bayes modela izvedeni su korišćenjem pretrage za optimizaciju hiperparametara. Hiperparametar \textit{var\_smoothing}, koji dodaje varijansu na procene verovatnoće kako bi se stabilizovale procene, optimizovan je korišćenjem unakrsne validacije (cross-validation) sa deset preklopnih skupova (foldova).
 
 \subsubsection{Rezultati}
 Nakon optimizacije hiperparametara, Gaussian Naive Bayes model je evaluiran na test skupu podataka. Rezultati su prikazani u sledećim slikama.
@@ -552,7 +552,18 @@ Nakon optimizacije hiperparametara, Gaussian Naive Bayes model je evaluiran na t
 
 \section{Zaključak}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=150mm]{conclusion.png}
+    \caption{Rezultati korišćenih modela}
+    \label{fig:enter-label}
+\end{figure}
 
+Na osnovu ovih rezultata, možemo zaključiti da je Random Forest model pokazao najbolje performanse u svim evaluacionim metrikama. Decision Tree se takođe može smatrati dobrom alternativom zbog svojih visokih performansi i jednostavnosti interpretacije.
+
+Ipak, moramo napomenuti da ne postoji univerzalno najbolji model u realnom svetu. Kao što je George E.P. Box jednom rekao: „Svi modeli su pogrešni, ali neki su korisni.“ Važno je samo pronaći model koji je najkorisniji za konkretan problem i podatke.
+
+\newpage
 \begin{thebibliography}{Literatura}
 \bibitem{} Pang-Ning Tan - Introduction to Data Mining (2019, Pearson Education Limited)
 \bibitem{} The SuperCOSMOS Sky Survey - I. Introduction and description (2001) by N. Hambly, H. MacGillivray, M. Read, S. Tritton, E. Thomson, D. Kelly, D. Morgan, R. Smith, S. Driver, J. Williamson, Q. Parker, M. Hawkins, P. Williams and A. Lawrence
