@@ -6,6 +6,7 @@
 \usepackage{graphicx}
 \usepackage{geometry}
 \geometry{margin=1in}
+\usepackage{float}
 \title{Klasifikacija zvezda od galaksija korišćenjem klasifikacionih algoritama}
 \author{\\Aleksa Toroman 84/2018 & Milica Sudar 79/2017 \\\\ Univerzitet u Beogradu, Matematički fakultet}
 
@@ -49,7 +50,7 @@ U ovom istraživanju razmatrana su dva različita skupa podataka: jedan sa Super
 Podaci sa SuperCOSMOS Sky Survey sajta prikupljeni su korišćenjem dostupnih pretraga i alata za ekstrakciju podataka dostupnih na njihovom zvaničnom sajtu. Originalno, skup podataka je sadržao 901,322 redova i 43 atributa.
 Tokom pretprocesiranja ovih podataka identifikovano je nekoliko značajnih problema u samom skupu:
 \begin{itemize}
-    \item \textbf{Magnituda}: Mnoge vrednosti za magnitude (u, g, r, i, z) su bile prazne ili su imale placeholder vrednosti koje su bile velike cifre, što je indiciralo nedostatak stvarnih podataka ili prisustvo grešaka. Ove vrednosti su morale biti odstranjene pre dalje analize.
+    \item \textbf{Magnitude}: Mnoge vrednosti za magnitude (u, g, r, i, z) su bile prazne ili su imale placeholder vrednosti koje su bile velike cifre, što je indiciralo nedostatak stvarnih podataka ili prisustvo grešaka. Ove vrednosti su morale biti odstranjene pre dalje analize.
     \item \textbf{RA i DEC}: Vrednosti za Celestial Right Ascension (RA) i Celestial Declination (DEC) su bile vrlo slične za sve redove, što je ukazivalo na to da su podaci dobijeni sa ograničenog područja neba. Ovo je bilo posledica limitacije upita  koji je vraćao podatke samo iz određenih regiona sa definisanim radijusom pretrage. Ovaj nedostatak bi možda uticao da se ne vide određeni šabloni u raspodeli zvezda i galaksija na osnovu njihovih lokacija.
 \end{itemize}
 
@@ -58,9 +59,9 @@ Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 
 \subsection{Sloan Digital Sky Survey}
 Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita u njihovom data centru. Upit je preuzet sa SDSS sajta i modifikovan tako da obuhvati podatke koji uključuju samo zvezde i galaksije, isključujući quasare kao tip nebeskih objekata.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{sql.png}
+\includegraphics[width=100mm]{sql.png}
 \caption{SQL upit korišćen za prikupljanje podataka sa SDSS sajta}
 \label{fig:sql_query}
 \end{figure}
@@ -75,22 +76,20 @@ Pretprocesiranje podataka sa SDSS sajta pokazalo je znatno manji broj nedostaju�
 \subsubsection{Učitavanje podataka}
 Podaci su učitani korišćenjem biblioteke pandas, koja je moćan alat za manipulaciju i analizu podataka u Pythonu. Nakon učitavanja, proverili smo da li je skup podataka uspešno dovučen i uradili smo osnovne operacije za pregled podataka i njegove statistike. Takođe u ovom procesu su i isključene kolone koje nisu potrebne za dalju analizu i treniranje modela za klasifikaciju (više o izboru atributa u narednoj sekciji):
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{list_data.png}
+\includegraphics[width=150mm]{list_data.png}
 \caption{Izlistavanje nekolicine redova učitanog skupa podataka}
 \label{fig:sql_query}
 \end{figure}
-
-\clearpage
 
 \subsubsection{Identifikacija i uklanjanje anomalija}
 Proces čišćenja podataka je ključan korak u pripremi podataka za treniranje modela. Ovaj proces uključuje identifikaciju i uklanjanje anomalija i outlier-a i razrešavanje praznih vrednosti.\\\\
 Prvo smo proverili da li skup podatak ima nedostajuće vrednosti u nekim kolonama:
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{null_column_check.png}
+\includegraphics[width=80mm]{null_column_check.png}
 \caption{Provera nedostajućih vrednosti u kolonama}
 \label{fig:sql_query}
 \end{figure}
@@ -101,9 +100,9 @@ Međutim, naš skup podataka nije imao takav slučaj pa smo obradu ovakvih redov
 Za uklanjanje outlier-a koristili smo algoritam Local Outlier Factor (LOF) za identifikaciju i uklanjanje outlier-a. LOF algoritam procenjuje udaljenost svakog podatka od njegovih suseda i identifikuje one podatke koji se značajno razlikuju od ostatka skupa.\\\\
 Takođe, i bez algoritma jednostavnim pregledom osnovih statistika smo uvideli da neke kolone u sebi imaju određene anomalije:\\\\
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{data_model_anomalies.png}
+\includegraphics[width=160mm]{data_model_anomalies.png}
 \caption{Prikaz osnovne statistike skupa podataka}
 \label{fig:sql_query}
 \end{figure}
@@ -116,13 +115,14 @@ Koraci u procesu čišćenja podataka uključivali su:
 \end{itemize}
 Korišćenjem ovog pristupa, uspeli smo da identifikujemo i uklonimo outlier-e iz skupa podataka, čime smo poboljšali kvalitet podataka za treniranje modela. Nakon čišćenja podataka, preostalo je 492,153 redova koji su bili kvalitetni za dalju analizu.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{data_model_filtered.png}
+\includegraphics[width=160mm]{data_model_filtered.png}
 \caption{Skup podataka nakon uklanjanja outlier-a}
 \label{fig:sql_query}
 \end{figure}
 
+\clearpage
 \subsection{Odabir atributa za treniranje modela}
 
 Proces odabira atributa započeo je razumevanjem i analizom svakog atributa. Nakon toga, koristili smo različite grafičke prikaze kako bismo identifikovali koji atributi mogu biti najznačajniji za treniranje modela.\\\\
@@ -130,9 +130,12 @@ Proces odabira atributa započeo je razumevanjem i analizom svakog atributa. Nak
 \subsubsection{Odstranivanje nepotrebnih atributa}
 
 Za početak bez ikakve dodatne analize mogli smo da odstranimo neke atribute samo na osnovu njihovog značenja.
-\\\\Atributi kao što su 'objid', 'run' i 'rerun' odnose se na administraciju podataka i nisu direktno bitni za izradu samog klasifikacionog modela.
-\\\\Atributi 'camcol', 'field', 'plate' i 'fiberid' predstavljaju tehničke podatke koji se odnose na uslove pod kojima je snimljen nebeski objekat.
-\\\\Atribut 'mjd' predstavlja modifikovani Julianov datum posmatranja i nije relevantan za određivanje da li je objekat zvezda ili galaksija.
+
+\noindent Atributi kao što su 'objid', 'run' i 'rerun' odnose se na administraciju podataka i nisu direktno bitni za izradu samog klasifikacionog modela.
+
+\noindent Atributi 'camcol', 'field', 'plate' i 'fiberid' predstavljaju tehničke podatke koji se odnose na uslove pod kojima je snimljen nebeski objekat.
+
+\noindent Atribut 'mjd' predstavlja modifikovani Julianov datum posmatranja i nije relevantan za određivanje da li je objekat zvezda ili galaksija.
 
 \subsubsection{Izračunati atributi}
 
@@ -153,13 +156,11 @@ U razmatranje smo takođe uzeli u obzir i atribute koji nisu direktno dostupni u
     \item \textbf{DEC (Declination)}: Druga osnovna nebeska koordinata koja se koristi za određivanje položaja objekata na nebeskoj sferi. DEC se meri u stepenima, minutima i sekundama, i predstavlja ugaonu udaljenost objekta severno ili južno od nebeskog ekvatora. DEC je ekvivalent geografskoj širini na Zemlji.
 \end{itemize}
 
-\clearpage
-
 Sledeći grafikon prikazuje prostorni raspored zvezda i galaksija u ekvatorijalnim koordinatama. 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{equatorial_coordinate_map.png}
+\includegraphics[width=150mm]{equatorial_coordinate_map.png}
 \caption{Prostorni raspored zvezda i galaksija u ekvatorijalnim koordinatama}
 \label{fig:equatorial_coordinates}
 \end{figure}
@@ -186,11 +187,9 @@ Magnituda je mera sjaja nebeskog objekta viđenog sa Zemlje. Postoji pet filtera
 Značaj magnituda može se uočiti kroz prikaz odgovarajuće korelacione matrice za ove atribute.
 \\\\Korelaciona matrica je vizualni prikaz koji pokazuje međusobnu povezanost različitih atributa korišćenih u skupu podataka.
 
-\clearpage
-
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{correlation_matrix.png}
+\includegraphics[width=120mm]{correlation_matrix.png}
 \caption{Korelaciona matrica za atribute zvezda i galaksija}
 \label{fig:correlation_matrix}
 \end{figure}
@@ -201,11 +200,10 @@ Na grafikonu su prikazane korelacije između magnituda za zvezde (desno) i galak
 \subsubsection{Redshift}
 Crveni pomak je ključan fenomen u astronomiji jer omogućava određivanje udaljenosti i brzine udaljavanja nebeskih objekata, što je posebno važno za klasifikaciju između zvezda i galaksija. Razumevanje crvenog pomaka pomaže u identifikaciji galaksija koje se udaljavaju od nas zbog širenja svemira, dok zvezde, sa svojim karakterističnim relativnim brzinama unutar naše galaksije, pružaju dodatne informacije o njihovim kretanjima i položajima u odnosu na Sunčev sistem.
 
-\clearpage
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{redshift_hist.png}
+\includegraphics[width=150mm]{redshift_hist.png}
 \caption{Histogram crvenog pomaka za zvezde i galaksije}
 \label{fig:redshift_hist}
 \end{figure}
@@ -241,9 +239,9 @@ Za treniranje klasifikacionih modela korišćeni su sledeći atributi: 'ra', 'de
 
 Prvo što želimo da uradimo, želimo da proverimo koji je odnos klasa koje imamo u našem skupu podataka.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{class_count_result.png}
+\includegraphics[width=120mm]{class_count_result.png}
 \caption{Odnos klasa u skupu podataka}
 \label{fig:sql_query}
 \end{figure}
@@ -260,19 +258,25 @@ Podaci su podeljeni tako da trening skup čini 75\% ukupnih podataka, i test sku
 Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.\\\\
 Treba napomenuti da nismo unapred definisali i odredili validacioni skup, koji bismo koristili za korigovanje različitih hiperparametara kod različitih klasifikacionih algoritama. Umesto toga, koristili smo kros validaciju (cross-validation) kako bismo evaluirali performanse modela i optimizovali hiperparametre.
 
-\subsubsection{Kros Validacija}
-Kros validacija je tehnika koja se koristi za procenu performansi modela i osiguravanje njegove generalizacije na nezavisnim skupovima podataka. U ovoj tehnici, prilikom treniranja modela, trening podaci se dele na $k$ podskupova (ili foldova). Model se trenira na $k-1$ podskupovima, a validira se na preostalom podskupu. Ovaj proces se ponavlja $k$ puta, tako da svaki podskup bude korišćen kao validacioni barem jednom. Na kraju, rezultati svih iteracija se agregiraju kako bi se dobila pouzdana procena performansi modela.\\\\
+\subsubsection{Unakrsna validacija}
+Unakrsna validacija je tehnika koja se koristi za procenu performansi modela i osiguravanje njegove generalizacije na nezavisnim skupovima podataka. U ovoj tehnici, prilikom treniranja modela, trening podaci se dele na $k$ podskupova (ili foldova). Model se trenira na $k-1$ podskupovima, a validira se na preostalom podskupu. Ovaj proces se ponavlja $k$ puta, tako da svaki podskup bude korišćen kao validacioni barem jednom. Na kraju, rezultati svih iteracija se agregiraju kako bi se dobila pouzdana procena performansi modela.\\\\
 Korišćenjem kros validacije, postigli smo nekoliko stvari:
 \begin{itemize}
     \item \textbf{Optimizaciju hiperparametara}: Kros validacija omogućava efikasno podešavanje hiperparametara modela bez potrebe za unapred definisanim validacionim skupom, što može povećati tačnost modela.
     \item \textbf{Bolju ocenu generalizacije}: Kros validacija pomaže da se model generalizuje bolje na nezavisnim podacima jer koristi različite podskupove za treniranje i validaciju i samim tim možemo biti sigurniji da će se model ponašati slično i na testnim podacima kasnije.
 \end{itemize}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=120mm]{cross-validation.png}
+\caption{Unakrsna validacija}
+\label{fig:cross_validation}
+\end{figure}
+
 \subsubsection{Skaliranje Podataka}
 Skaliranje podataka je ključan korak u pripremi podataka za treniranje modela. Podaci su standardizovani tako da imaju srednju vrednost 0 i standardnu devijaciju 1. Ovo je važno jer određeni algoritmi klasifikacije zahtevaju skalirane podatke kako bi se izbeglo da atributi sa većim opsegom vrednosti postanu automatski važniji od ostalih atributa. Skaliranje osigurava da svi atributi imaju jednaku težinu prilikom treniranja modela.\\\\
 Skaliranje podataka je takođe značajno za mnoge optimizacione algoritme, kao što je gradijentni spust, jer doprinosi bržoj konvergenciji i stabilnijem učenju modela. Standardizacija podataka omogućava algoritmima da efikasnije pretražuju prostor rešenja, što rezultira boljim performansama i bržim treniranjem.
-
-
+Još jedna bitna napomena jeste da podatke treba normalizovati nakon što ih podelimo na trening i test skupove kako bismo sprečili 'curenje podataka' koje bi modelu dalo dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom, a podelu podataka izvršili naknadno.
 
 \section{Klasifikacioni Algoritmi}
 
@@ -308,7 +312,6 @@ Važno je napomenuti da je skup podataka neuravnotežen, sa većim brojem galaks
 
 Uz ove metrike, koristili smo i matricu konfuzije za dodatnu evaluaciju modela. Matrica konfuzije je tabela koja prikazuje stvarne klase naspram predviđenih klasa, omogućavajući identifikaciju tačno i pogrešno klasifikovanih instanci. Redovi matrice predstavljaju stvarne klase, dok kolone predstavljaju predviđene klase. Matrica konfuzije pomaže u vizualizaciji performansi modela i identifikaciji specifičnih vrsta grešaka, kao što su lažno pozitivni i lažno negativni primerci.\\\\
 
-\clearpage
 
 \subsection{Stabla odlučivanja}
 Decision tree (stablo odluke) je jedan od najjednostavnijih i najintuitivnijih algoritama za klasifikaciju. Radi tako što deli podatke na osnovu vrednosti atributa i pravi hijerarhijsku strukturu odluka, gde svaka grana predstavlja ishod odluke, a svaki čvor predstavlja atribut po kojem se podaci dele.
@@ -320,12 +323,12 @@ Za treniranje Decision Tree modela korišćen je skup podataka koji je prethodno
 
 Decision Tree algoritmi imaju različite hiperparametre koji mogu uticati na kvalitet modela. Neki od tih hiperparametara uključuju maksimalnu dubinu stabla, minimalan broj uzoraka potrebnih za podelu čvora, minimalan broj uzoraka u listu i broj karakteristika koje se koriste za traženje najboljeg podele.
 
-Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu scikit-learn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan od parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo f1 score s obzirom na neuravnoteženost podataka. Važno je napomenuti da se ove promene hiperparametara i traženje najboljeg modela zasnivaju na evaluaciji modela u svakoj iteraciji pretrage koristeći unakrsnu validaciju kao vid validacije i evaluacije uspešnosti modela u svakoj iteraciji. Za naše modele koristi smo k=10 za broj foldova pri svakoj iteraciji. Mana ovog pristupa jeste u vremenskoj potrošnji, gde se broj 'fitova' odnosno treniranja modela računa kao broj mogučih permutacija hiperparametra * puta foldova.
-\\Nakon što smo odredili najbolji skup parametara, iskoristićemo ih da istreniramo model još jednom ali ovaj put ćemo uključiti ceo skup trening podataka.
+Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo GridSearchCV funkciju dostupnu u paketu scikit-learn, koja automatski pretražuje različite kombinacije hiperparametara i evaluira performanse modela za svaku od njih. Ovaj proces omogućava da se identifikuje konfiguracija hiperparametara koja daje najbolje rezultate za dati skup podataka. Takođe, jedan od parametara koji se prosleđuje ovoj funkciji predstavlja metriku koja će se koristiti za procenu kvaliteta modela prilikom pretrage, u ovom slučaju koristili smo preciznost(accuracy). Važno je napomenuti da se ove promene hiperparametara i traženje najboljeg modela zasnivaju na evaluaciji modela u svakoj iteraciji pretrage koristeći unakrsnu validaciju kao vid validacije i evaluacije uspešnosti modela u svakoj iteraciji. Za naše modele koristi smo k=10 za broj foldova pri svakoj iteraciji. Mana ovog pristupa jeste u vremenskoj potrošnji, gde se broj 'fitova' odnosno treniranja modela računa kao broj mogučih permutacija hiperparametra * puta foldova.
+\\\\Nakon što smo odredili najbolji skup parametara, iskoristićemo ih da istreniramo model još jednom ali ovaj put ćemo uključiti ceo skup trening podataka.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{best_dtree.png}
+\includegraphics[width=150mm]{best_dtree.png}
 \caption{Najbolji parametri za model stabla odlučivanja}
 \label{fig:best_dtree}
 \end{figure}
@@ -334,20 +337,18 @@ Kako bismo pronašli najbolju kombinaciju ovih hiperparametara, koristili smo Gr
 
 Nakon optimizacije hiperparametara, model je evaluiran na test skupu podataka. Rezultati pokazuju visoku tačnost i odlične metrike za klasifikaciju.
 
-\clearpage
-
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{decision_tree_classification_report.png}
+\includegraphics[width=90mm]{decision_tree_classification_report.png}
 \caption{Rezultati klasifikacije stabla odlučivanja na test skupu}
 \label{fig:decision_tree_classification_report}
 \end{figure}
 
 Rezultati pokazuju da je model stabla odlučivanja vrlo efikasan u klasifikaciji nebeskih objekata, sa visokim vrednostima preciznosti, odziva i F1-score-a za obe klase.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{decision_tree_cm.png}
+\includegraphics[width=90mm]{decision_tree_cm.png}
 \caption{Matrica konfuzije za model stabla odlučivanja na test skupu}
 \label{fig:decision_tree_cm}
 \end{figure}
@@ -355,6 +356,7 @@ Rezultati pokazuju da je model stabla odlučivanja vrlo efikasan u klasifikaciji
 Matrica konfuzije pruža dodatni uvid u rezultate evaluacije modela, prikazujući tačne i netačne klasifikacije za svaku klasu.
 \\\\Ovi rezultati potvrđuju da algoritam stabla odlučivanja može biti izuzetno efikasan za klasifikaciju nebeskih objekata, pružajući visok nivo tačnosti i pouzdanosti.
 
+\newpage
 \subsection{Logistička regresija}
 Logistička regresija (logistic regression) je popularan algoritam za binarnu klasifikaciju koji modelira verovatnoću da primerak pripada određenoj klasi. Algoritam koristi logističku funkciju za predikciju verovatnosti, a zatim klasifikuje primerke na osnovu praga verovatnoće (obično 0.5).
 
@@ -367,24 +369,21 @@ Kako bismo dodatno poboljšali kvalitet modela i smanjili varijansu, korišćena
 Prosečna tačnost modela procenjena unakrsnom validacijom je pokazala visok nivo tačnosti, sa malim standardnim odstupanjem, što ukazuje na konzistentne performanse modela.
 
 \begin{verbatim}
-Mean Accuracy: 0.991 (0.001)
+Mean Accuracy: 0.99019 (0.001)
 \end{verbatim}
 
 \subsubsection{Rezultati}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{logistic_regression_classification_report.png}
+\includegraphics[width=90mm]{logistic_regression_classification_report.png}
 \caption{Rezultati klasifikacije modela na test skupu}
 \label{fig:logistic_regression_classification_report}
 \end{figure}
 
-\clearpage
-
-
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{logistic_regression_cm.png}
+\includegraphics[width=90mm]{logistic_regression_cm.png}
 \caption{Matrica konfuzije za Logistic Regression model na test skupu}
 \label{fig:logistic_regression_cm}
 \end{figure}
@@ -394,52 +393,24 @@ Ova greška može biti značajna u određenim aplikacijama, čime stabla odlčiv
 
 \subsection{K-najbližih suseda}
 
-KNN(K-nearest neighbors= ili k-najbližih suseda je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom slučaju koristićemo ga za klasifikaciju. Klasifikacija najbližih suseda je deo opšte tehnike poznate kao učenje zasnovano na instancama, koja ne gradi globalni model, već koristi primere iz treniranja za pravljenje predikcija za test instance. (Stoga se za takve klasifikatore često kaže da su "bez modela.") Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koristi za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje, Menhetn rastojanje...
+K-najbližih suseda (KNN) je jednostavan, ali moćan algoritam mašinskog učenja koji se koristi za zadatke klasifikacije i regresije. U ovom radu koristićemo ga za klasifikaciju. KNN ne gradi globalni model, već koristi primere iz trening skupa za pravljenje predikcija za test instance. Takvi algoritmi zahtevaju meru blizine kako bi odredili sličnost ili udaljenost između instanci i funkciju klasifikacije koja vraća predviđenu klasu test instance na osnovu njene blizine drugim instancama. Neke od mera udaljenosti koje se koriste za pronalaženje najbližeg suseda su: Euklidsko rastojanje, rastojanje Minkovskog, Hamingovo rastojanje i Menhetn rastojanje.
 
 \subsubsection{Normalizacija podataka}
-Kod k-najbližih suseda neophodno je da su podaci normalizovani, zato što algoritam koristi meru za udaljenost između tačaka.
-Podatke treba normalizovati nakon što ih podelimo na trening i test skupove. Ovo je da bi se sprečilo 'curenje podataka' jer bi normalizacija dala modelu dodatne informacije o test skupu ako bismo normalizovali sve podatke odjednom.
+Kod KNN algoritma neophodno je da su podaci normalizovani, zato što algoritam koristi meru za udaljenost između tačaka.
 
 \subsubsection{Prilagođavanje i evaluacija modela}
-Krećemo sa obučavanjem modela. Za ovo ćemo koristiti fiksiranu vrednost 5 za k, ali ćemo kasnije morati da optimizujemo ovo. Prvo kreiramo instancu KNN modela, zatim ćemo prilagoditi ovaj model našim trening podacima. Prosleđujemo i karakteristike i ciljnu promenljivu, tako da model može da uči.
+Za prilagođavanje KNN modela, koristili smo grid pretragu u kombinaciji sa unakrsnom validacijom kako bismo optimizovali vrednosti hiperparametara. Izbor vrednosti 'k' igra ključnu ulogu u performansama KNN modela. Klasifikator sa malim brojem suseda može dovesti do preprilagođavanja, dok model sa mnogo suseda može dovesti do nedovoljno prilagođenog modela.
+\\\\Ukoliko vizualizujemo sad performanse modela za različite vrednosti k na trening podacima, najbolje performanse su koristeći oko 6 suseda. Što je broj suseda veći to model postaje jednostavniji i tačnost na trening skupu opada. Međutim, ako pogledamo y-osu, razlika između tačnosti nije velika i bilo koja vrednost 'k' bi dobro obavila posao na našem problemu jer je najgora performansa oko 0.976.
 
-Nakon što je model obučen. Možemo napraviti predikcije na test skupu podataka, koje kasnije možemo koristiti za ocenjivanje modela.
-Najjednostavniji način za evaluaciju ovog modela je korišćenjem tačnosti. Proveravamo predikcije u odnosu na stvarne vrednosti u test setu i brojimo koliko je model tačno predvideo.
-U našem slučaju to iznosi
-
-\begin{verbatim}
-    KNN accuracy - test set: 0.9829
-\end{verbatim}
-
-\subsubsection{Optimizacija modela}
-Izbor vrednosti 'k' igra ključnu ulogu u performansama KNN modela. Klasifikator sa malim brojem suseda odgovara visokoj složenosti modela što može dovesti do preprilagođavanja i verovatno će loše raditi na test skupu podataka. Sa druge strane, model sa mnogo suseda odgovara niskoj složenosti modela. Slično kao i kod prethodnih modela, za traženje najboljeg skupa hiperparametara koristili smo pretragu u kombinaciji sa unakrsnom validacijom.
-
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{cross-validation.png}
-\caption{Unakrsna validacija}
-\label{fig:cross_validation}
-\end{figure}
-
-Prvo cemo odraditi grid pretragu da proverimo koji broj suseda ce dati najbolje performanse modela.
-Nakon treniranja, možemo proveriti koji od naših testiranih vrednosti za n\textunderscore neighbors je najbolje performirao. Da bismo to uradili, pozvaćemo best\textunderscore params\textunderscore  na našem modelu.
-
-\begin{verbatim}
-    Best params:  {'n_neighbors': 6}
-    Best estimator:  KNeighborsClassifier(n_neighbors=6)
-    Best score:  0.9828044147934559
-\end{verbatim}
-
-Vizualizujmo sad performanse modela za različite vrednosti k na trening podacima. Najbolje performanse su koristeći oko 6 suseda. Što je broj suseda veći to model postaje jednostavniji i tačnost na trening skupu opada. Međutim, ako pogledate y-osu, razlika između tačnosti nije velika i bilo koja vrednost 'k' bi dobro obavila posao na našem problemu jer je najgora performansa oko 0.976.
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.7\textwidth]{knn_accuracy_vs_knn.png}
+\includegraphics[width=90mm]{knn_accuracy_vs_knn.png}
 \caption{Odnos performansi modela i broja suseda}
 \label{fig:knn_accuracy_vs_knn}
 \end{figure}
 
-Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
+Slično kao i kod prethodnih modela, za traženje najboljeg skupa hiperparametara koristili smo grid pretragu u kombinaciji sa unakrsnom validacijom.
+\\\\Kako bismo poboljšali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
 \begin{verbatim}
     param_grid = {
         "n_neighbors": np.arange(1,12),
@@ -449,21 +420,19 @@ Kako bismo pobolj[ali model optimizujemo tri glavna hiperparametra koja utiču n
     }
 \end{verbatim}
 \begin{itemize}
-    \item n\textunderscore neighbors: Ovo predstavlja broj najbližih suseda koje k-NN algoritam treba da uzme u obzir.
-    \item weights: Ovo određuje način na koji se računa doprinos svakog suseda. Postoje dve opcije:
+    \item \textbf{n\textunderscore neighbors}: Ovo predstavlja broj najbližih suseda koje k-NN algoritam treba da uzme u obzir.
+    \item \textbf{weights}: Ovo određuje način na koji se računa doprinos svakog suseda. Postoje dve opcije:
     \begin{itemize}
-        \item uniform: Svi susedi imaju isti doprinos bez obzira na udaljenost
-        \item distance: Susedi bliži tački imaju veći doprinos nego udaljeni susedi.
+        \item \textbf{uniform}: Svi susedi imaju isti doprinos bez obzira na udaljenost
+        \item \textbf{distance}: Susedi bliži tački imaju veći doprinos nego udaljeni susedi.
     \end{itemize}
-    \item metric: Ovo određuje način na koji se meri udaljenost između tačaka. Postoje dve opcije:
+    \item \textbf{metric}: Ovo određuje način na koji se meri udaljenost između tačaka. Postoje dve opcije:
     \begin{itemize}
-        \item euclidean
-        \item manhattan
+        \item \textbf{euclidean}
+        \item \textbf{manhattan}
     \end{itemize}
     \item n\textunderscore jobs: Ovo određuje broj paralelnih zadataka koje treba pokrenuti prilikom obrade. Vrednost 4 znači da će se koristiti četiri procesorska jezgra za paralelnu obradu.
-
 \end{itemize}
-\subsubsection{Rezultati}
 Rezultati su pokazali da je najbolja kombinacija parametara
 \begin{verbatim}
     Best params: {'metric': 'manhattan',
@@ -473,60 +442,52 @@ Rezultati su pokazali da je najbolja kombinacija parametara
     Best score:  0.9835416993884458
 \end{verbatim}
 
-Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobijen model na test podacima(podaci koje model nije jos uvek video) i da vidimo kolika će biti uspešnost modela.
-\begin{figure}[h!]
+Nakon što smo odradili optimizaciju modela vreme je da pokrenemo najbolje dobijen model na test podacima i da vidimo kolika će biti uspešnost modela.
+
+\subsubsection{Rezultati}
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{knn_classification_result.png}
+\includegraphics[width=90mm]{knn_classification_result.png}
 \caption{Rezultati KNN modela na test skupu}
 \label{fig:knn_classification_result}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{knn_cm.png}
+\includegraphics[width=90mm]{knn_cm.png}
 \caption{Matrica konfuzije za KNN model na test skupu}
 \label{fig:knn_cm}
 \end{figure}
 
-Korišćenjem unakrsne validacije i grid pretrage možemo dobiti značajnije rezultate u poređenju sa našim originalnim deljenjem trening/test sa minimalnim podešavanjima. Unakrsna validacija je veoma važna metoda koja se koristi za kreiranje bolje prilagođenih modela obukom i testiranjem na svim delovima skupa podataka za obuku.
-Iako unakrsna validacija može znatno koristiti razvoju modela, takođe postoji važna mana koja treba uzeti u obzir prilikom sprovođenja unakrsne validacije. Zbog toga što svaka iteracija modela, do k puta, zahteva da pokrenete ceo model, može postati računski skupo kako vaš skup podataka postaje veći i kako vrednost 'k' raste.
+Vidimo da ovaj model postiže lošije rezultate u odnosu na prvobitna dva algoritma.
 
 \subsection{Slučajna šuma}
-Metod slučcajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja.
-Ansambl(skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa
-za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa
-za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup
-ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako
-bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku
-agregacijom.
-
-Slučajne šume su jedan od najprimenjenijih algoritama mašinskog učenja.
-Njihovo obučavanje je relativno efikasno, a preciznost predvidanja obično među
+Metod slučajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja.
+Ansambl(skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku agregacijom.
+\\\\Slučajne šume su jedan od najprimenjenijih algoritama mašinskog učenja.
+Njihovo obučavanje je relativno efikasno, a preciznost predvidjanja obično među
 najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume suČ zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage.
 
 \subsubsection{Treniranje modela}
 Kao i kod svakog drugog modela mašinskog učenja potrebno je podeliti podatke na
 trening i test skupove. Korišćenje slučajne šume obično ne zahteva skaliranje podataka. Algoritmi za slučajne šume, kao i drugi algoritmi bazirani na stablima odluke, nisu osetljivi na skalu ili distribuciju podataka.
 
-Prvo ćemo da kreiramo model sa podrazumevanim parametrima.Uspešnost modela iznosi u ovom slučaju iznosi 0.998528.
-
 \subsubsection{Optimizacija modela}
 Hiperparametri se koriste u slučajnim šumama da bi se poboljšale performanse i prediktivna moć modela ili da bi model bio brži.
 Hiperparametri na koje smo se odlučili da se fokusiramo su:
 \begin{itemize}
-    \item n\textunderscore estimators - broj stabala u šumi
-    \item max\textunderscore features - maksimalan broj atributa korišćenih pri podeli čvora, obično manji od broja atributa u skupu podataka
-    \item max\textunderscore depth - maksimalan broj nivoa u svakom stablu odluke
-    \item min\textunderscore samples\textunderscore split - minimalan broj podataka u čvoru pre nego što se čvor podeli
-    \item min\textunderscore samples\textunderscore leaf - minimalan broj podataka dozvoljen u listu
-    \item criterion - funkcija za merenje kvaliteta podele
+    \item \textbf{n\textunderscore estimators} - broj stabala u šumi
+    \item \textbf{max\textunderscore features} - maksimalan broj atributa korišćenih pri podeli čvora, obično manji od broja atributa u skupu podataka
+    \item \textbf{max\textunderscore depth} - maksimalan broj nivoa u svakom stablu odluke
+    \item \textbf{min\textunderscore samples\textunderscore split} - minimalan broj podataka u čvoru pre nego što se čvor podeli
+    \item \textbf{min\textunderscore samples\textunderscore leaf} - minimalan broj podataka dozvoljen u listu
+    \item \textbf{criterion} - funkcija za merenje kvaliteta podele
 \end{itemize}
 
 Postoji nekoliko tehnika optimizacije hiperparametara za algoritam slučajne šume, kao što su grid pretraga, Bajesova optimizacija ili nasumična pretraga. Za razliku od grid pretrage, za podešavanje hiperparametara zasnovano na nasumičnoj pretrazi se ne koriste svi atributi. Grid pretraga iscrpno pretražuje svaku kombinaciju dobro definisanih vrednosti hiperparametara, što značajno povećava vreme obrade. Međutim, nasumična pretraga uzima uzorak konstantne veličine konfiguracija atributa određenih raspodelom njihovih vrednosti. Korišćenje nasumične pretrage omogućava pronalaženje raznovrsnije regije hiperparametara. Iako ne garantuje pronalaženje hiperparametara koji čine najbolju kombinaciju, dovoljno je dobra da brzo postigne vrlo dobru kombinaciju, što je posebno važno kada se radi sa skupovima podataka u astronomiji, gde obično postoji veliki broj opservacija, što generiše značajno vreme obrade.
 
-Izvršili smo nasumičnu pretragu parametara koristeći unakrsnu validaciju (cv=10), kroz 100 različitih kombinacija (n\textunderscore iter=100), i sa svim dostupnim jezgrima istovremeno (n\textunderscore jobs=-1). Nasumična pretraga nasumično bira kombinaciju atributa umesto iteriranja kroz svaku moguću kombinaciju. Veći n\textunderscore iter i cv rezultiraju većim brojem kombinacija i manjom mogućnošću prekomernog prilagođavanja. U svakoj iteraciji, algoritam će odabrati različitu kombinaciju atributa.
-
-\subsubsection{Rezultati}
+Izvršili smo nasumičnu pretragu parametara koristeći unakrsnu validaciju (cv=10), kroz 100 različitih kombinacija (n\textunderscore iter=100), i sa svim dostupnim jezgrima istovremeno (n\textunderscore jobs=-1). Nasumična pretraga nasumično bira kombinaciju atributa umesto iteriranja kroz svaku moguću kombinaciju. Veći n\textunderscore iter i cv rezultiraju većim brojem kombinacija i manjom mogućnošću prekomernog prilagođavanja. U svakoj iteraciji, algoritam će odabrati različitu kombinaciju atributa.\\\\
 Najbolji parametri koji su dobijeni nasumičnom pretragom
 \begin{verbatim}
     {
@@ -539,38 +500,32 @@ Najbolji parametri koji su dobijeni nasumičnom pretragom
     }
 \end{verbatim}
 
-Nakon što smo odradili optimizaciju modela vremem je da pokrenemo najbolje dobijen model na test podacima(podaci koje model nije jos uvek video) i da vidimo kolika će biti uspešnost modela.
+\subsubsection{Rezultati}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{random_forest.png}
-    \caption{Rezultati Slučajne sume na test skupo}
-    \label{fig:random_forest}
+\begin{figure}[H]
+\centering
+\includegraphics[width=90mm]{random_forest.png}
+\caption{Rezultati Slucajne sume na test skupu}
+\label{fig:random_forest}
 \end{figure}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{random_forest_cm.png}
-    \caption{Matrica konfuzije za Slučajnu sumu na test skupu}
-    \label{fig:random_forest_cm}
+\begin{figure}[H]
+\centering
+\includegraphics[width=90mm]{random_forest_cm.png}
+\caption{Matrica konfuzije za Slucajnu sumu na test skupu}
+\label{fig:random_forest_cm}
 \end{figure}
-
-Primećujemo poboljšanje u performansama modela; dok je tačnost sa podrazumevanim parametrima bila 0.99852, ona je porasla na 0.99876 nakon optimizacije.
 
 Još jedna od dobrih karakteristika slučajne šume jeste što možemo da odredimo važnost svakog pojedinačnog atributa.
-\begin{figure}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{feature_importance.png}
+    \includegraphics[width=80mm]{feature_importance.png}
     \caption{Važnost atributa}
     \label{fig:feature_importance}
 \end{figure}
 
-
-Crveni pomak je najvažnija karakteristika od svih, jer informiše o udaljenosti i brzini entiteta u odnosu na Zemlju. Crveni pomak se dešava kada svetlost izgleda pomerena ka dužim, odnosno crvenijim, talasnim dužinama, uzrokovano Doplerovim efektom, ili fenomenom u kojem opažena talasna dužina zavisi od kretanja posmatranog objekta u odnosu na posmatrača.
-Zvezde pokazuju minimalan crveni pomak, jer su relativno blizu Zemlji i ne kreću se značajnim brzinama. Galaksije pokazuju značajne crvene pomake, zbog svog kretanja udaljavanjem od Zemlje usled širenja univerzuma.
-
-
-\clearpage
+Možemo primetiti da je redshift najvažniji atribut od svih kao što smo i pretpostavili na početku na osnovu histograma.
 
 \subsection{Naive Bayes (Gaus)}
 Gaussian Naive Bayes (GNB) je algoritam za klasifikaciju zasnovan na Bayesovoj teoremi sa pretpostavkom da su karakteristike podjednako i nezavisno normalno distribuirane. Ovaj algoritam je jednostavan za implementaciju i efikasan, posebno za visoko-dimenzionalne podatke.
@@ -581,28 +536,31 @@ Treniranje i evaluacija Gaussian Naive Bayes modela izvedeni su korišćenjem pr
 \subsubsection{Rezultati}
 Nakon optimizacije hiperparametara, Gaussian Naive Bayes model je evaluiran na test skupu podataka. Rezultati su prikazani u sledećim slikama.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{gaussian_nb_classification_report.png}
+\includegraphics[width=90mm]{gaussian_nb_classification_report.png}
 \caption{Rezultati klasifikacije Gaussian Naive Bayes modela na test skupu}
 \label{fig:gaussian_nb_classification_report}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{gaussian_nb_cm.png}
+\includegraphics[width=90mm]{gaussian_nb_cm.png}
 \caption{Matrica konfuzije za Gaussian Naive Bayes model na test skupu}
 \label{fig:gaussian_nb_cm}
 \end{figure}
 
-Rezultati pokazuju visoku tačnost i dobre sveobuhvatne metrike:
-
-
 \section{Zaključak}
 
 
-\begin{thebibliography}{9}
-\bibitem{data_mining}
+\begin{thebibliography}{Literatura}
+\bibitem{} Pang-Ning Tan - Introduction to Data Mining (2019, Pearson Education Limited)
+\bibitem{} The SuperCOSMOS Sky Survey - I. Introduction and description (2001) by N. Hambly, H. MacGillivray, M. Read, S. Tritton, E. Thomson, D. Kelly, D. Morgan, R. Smith, S. Driver, J. Williamson, Q. Parker, M. Hawkins, P. Williams and A. Lawrence
+\bibitem{} The SuperCOSMOS Sky Survey. Paper II: Image detection, parameterisation, classification and photometry (2001) by N. Hambly, M. Irwin and H. MacGillivray
+\bibitem{} Identifying galaxies, quasars, and stars with machine learning: A new catalogue of classifications for 111 million SDSS sources without spectra A. O. Clarke, A. M. M. Scaife, R. Greenhalgh and V. Griguta
+\bibitem{} Probst, P.; Wright, M.N.; Boulesteix, A.L. Hyperparameters and tuning strategies for random forest. Wiley Interdiscip. Rev. Data Min. Knowl. Discov. 2019, 9, 1301.
+\bibitem{} Xu, B.; Huang, J.Z.; Williams, G.; Wang, Q.; Ye, Y. Classifying very high-dimensional data with random forests built from small subspaces. Int. J. Data Warehous. Min. **2012**, 8, 44–63.
+\bibitem{} Javeed, A.; Zhou, S.; Yongjian, L.; Qasim, I.; Noor, A.; Nour, R. An intelligent learning system based on random search algorithm and optimized random forest model for improved heart disease detection.
 \end{thebibliography}
 
 \end{document}
