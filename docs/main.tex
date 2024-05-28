@@ -139,7 +139,7 @@ Za početak bez ikakve dodatne analize mogli smo da odstranimo neke atribute sam
 
 \subsubsection{Izračunati atributi}
 
-U razmatranje smo takođe uzeli u obzir i atribute koji nisu direktno dostupni u samom skupu podataka, ali se mogu izračunati i imaju određeno značenje u konkretnom domenu. Takvi atributi u našem slučaju su takozvani 'colour-indexes'.
+U razmatranje smo takođe uzeli i atribute koji nisu direktno dostupni u samom skupu podataka, ali se mogu izračunati i imaju određeno značenje u konkretnom domenu. Takvi atributi u našem slučaju su takozvani 'colour-indexes'.
 \\\\Ovi atributi su izračunati na osnovu magnituda i predstavljaju razliku između sjaja u različitim delovima spektra. Oni pružaju dodatne informacije o karakteristikama nebeskih objekata.
         \begin{itemize}
             \item \textbf{color\_u\_g}: Razlika između magnituda u ultraljubičastom (u) i zelenom (g) delu spektra: $color\_u\_g = u - g$.
@@ -246,7 +246,7 @@ Prvo što želimo da uradimo, želimo da proverimo koji je odnos klasa koje imam
 \label{fig:sql_query}
 \end{figure}
 
-Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo trenirati nad svim dostupnim instancama.
+Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zvezda, svakako model ćemo trenirati na svim dostupnim instancama.
 \\\\Za uspešno treniranje i evaluaciju klasifikacionih modela, skup podataka je podeljen na dva dela: trening skup i test skup. Ovaj pristup omogućava pravilnu procenu performansi modela i njegovu generalizaciju na nove podatke.
 \\\\Skup podataka je podeljen na sledeći način:
 \begin{itemize}
@@ -255,7 +255,7 @@ Vidimo da u skupu podataka imamo mnogo veći broj galaksija u odnosu na broj zve
 \end{itemize}
 
 Podaci su podeljeni tako da trening skup čini 75\% ukupnih podataka, i test skup preostalih 25\%. Ova podela je odabrana kako bi se osiguralo da ima dovoljno podataka za treniranje modela, ali i dovoljno za testiranje.\\\\
-Takođe, prilikom podele podataka smo vodili pažnju da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.\\\\
+Takođe, prilikom podele podataka vodili smo računa da zadržimo originalni odnos zvezda i galaksija i u ovim podskupovima, kako ne bismo napravili trening i test skup koji su potencijalno još više disbalansirani.\\\\
 Treba napomenuti da nismo unapred definisali i odredili validacioni skup, koji bismo koristili za korigovanje različitih hiperparametara kod različitih klasifikacionih algoritama. Umesto toga, koristili smo unakrsnu validaciju (cross-validation) kako bismo evaluirali performanse modela i optimizovali hiperparametre.
 
 \subsubsection{Unakrsna validacija}
@@ -412,7 +412,7 @@ Za prilagođavanje KNN modela, koristili smo grid pretragu u kombinaciji sa unak
 \end{figure}
 
 Slično kao i kod prethodnih modela, za traženje najboljeg skupa hiperparametara koristili smo grid pretragu u kombinaciji sa unakrsnom validacijom.
-\\\\Kako bismo poboljšali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostaju na svojim podrazumevanim vrednostima.
+\\\\Kako bismo poboljšali model optimizujemo tri glavna hiperparametra koja utiču na prilagođavanje modela: n\textunderscore neighbours, weights i metric. Svi ostali hiperparametri ostali su na svojim podrazumevanim vrednostima.
 \begin{verbatim}
     param_grid = {
         "n_neighbors": np.arange(1,12),
