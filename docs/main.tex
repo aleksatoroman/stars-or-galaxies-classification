@@ -57,7 +57,7 @@ Tokom pretprocesiranja podataka identifikovano je nekoliko značajnih problema:
 Nakon uklanjanja nedostajućih vrednosti i outlier-a, preostalo je svega 80,000 redova za dalju analizu, što je znatno manje od originalnih 901,322 redova. Ovo smanjenje broja redova je posledica visokog procenta nedostajućih vrednosti i pre svega velikog prisustva ranije pomenutih placeholder-a koji su značajno umanjili kvalitet podataka.
 
 \subsection{Sloan Digital Sky Survey}
-Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita na njihovom data centru. Upit je konstruisan kako bi se dohvatili svi potencijalno relevantni atributi za vizualizaciju i treniranje klasifikacionog modela.
+Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odgovarajućeg SQL upita u njihovom data centru. Upit je preuzet sa SDSS sajta i modifikovan tako da obuhvati podatke koji uključuju samo zvezde i galaksije, isključujući quasare kao tip nebeskih objekata. Ovi podaci su zatim korišćeni za kreiranje unapred definisanih skupova podataka namenjenih za klasifikaciju.
 
 \begin{figure}[h!]
 \centering
@@ -66,8 +66,9 @@ Podaci sa Sloan Digital Sky Survey (SDSS) sajta prikupljeni su korišćenjem odg
 \label{fig:sql_query}
 \end{figure}
 
-Ovim upitom dohvaćeno je 500,000 redova, obuhvatajući sve potencijalno bitne atribute za dalju analizu. Spektar atributa koji je dostupan putem SDSS baze podataka je značajno veći u odnosu na SuperCOSMOS, što omogućava bogatiju analizu i bolje treniranje modela. Istraživanjem šeme podataka u SDSS bazi, identifikovan je veći broj atributa koji mogu biti korisni za klasifikaciju.\\\\
-S obzirom na to da je klasifikacija u ovom istraživanju fokusirana na razlikovanje zvezda i galaksija, eksplicitno smo tražili da se dohvate podaci koji uključuju samo one klase objekata koje pripadaju ili zvezdama ili galaksijama, isključujući quasare kao tip nebeskih objekata.\\\\
+Ovim upitom prikupljeno je 500,000 redova. Spektar atributa dostupan putem SDSS baze podataka je značajno veći u odnosu na SuperCOSMOS, što omogućava bogatiju analizu i bolje treniranje modela. Na osnovu preporuka i primera sa njihovog sajta, odabrali smo određeni podskup podataka iz ukupnog skupa dostupnih podataka za našu analizu.
+
+
 Pretprocesiranje podataka sa SDSS sajta pokazalo je znatno manji broj nedostajućih vrednosti i outlier-a u poređenju sa SuperCOSMOS Sky Survey skupom podataka. Nakon čišćenja podataka, preostalo je oko 492,000 redova koji su bili kvalitetni za dalju analizu. S obzirom na viši kvalitet podataka kao i veći broj slogova, dalji rad i analiza u ovom istraživanju fokusirani su na ovaj skup podataka.
 
 \subsection{Učitavanje i čišćenje podataka}
