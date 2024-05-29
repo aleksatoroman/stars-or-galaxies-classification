@@ -84,8 +84,8 @@ Podaci su učitani korišćenjem biblioteke pandas, koja je moćan alat za manip
 \end{figure}
 
 \subsubsection{Identifikacija i uklanjanje anomalija}
-Proces čišćenja podataka je ključan korak u pripremi podataka za treniranje modela. Ovaj proces uključuje identifikaciju i razrešavanje anomalija, outlier-a i praznih vrednosti. S obzirom na količinu dostupnih podataka, a imajući i u vidu osetljivost u vrednostima atributa, strategija za razrešavanje u našem scenariju je bila jednostavno odstranjivanje redova sa takvim anomalijama\\\\
-Prvo smo proverili da li skup podatak ima nedostajuće vrednosti u nekim kolonama:
+Proces čišćenja podataka je ključan korak u pripremi podataka za treniranje modela. Ovaj proces uključuje identifikaciju i razrešavanje anomalija, outlier-a i praznih vrednosti. S obzirom na količinu dostupnih podataka, a imajući i u vidu osetljivost u vrednostima atributa, strategija za razrešavanje u našem scenariju je bila jednostavno odstranjivanje redova sa takvim anomalijama.\\\\
+Prvo smo proverili da li skup podataka ima nedostajuće vrednosti u nekim kolonama:
 
 \begin{figure}[H]
 \centering
@@ -98,7 +98,7 @@ Međutim, naš skup podataka nije imao takav slučaj pa smo obradu ovakvih redov
 
 \clearpage
 Za uklanjanje outlier-a koristili smo algoritam Local Outlier Factor (LOF) za identifikaciju i uklanjanje outlier-a. LOF algoritam procenjuje udaljenost svakog podatka od njegovih suseda i identifikuje one podatke koji se značajno razlikuju od ostatka skupa.\\\\
-Takođe, i bez algoritma jednostavnim pregledom osnovih statistika smo uvideli da neke kolone u sebi imaju određene anomalije:\\\\
+Takođe, i bez algoritma jednostavnim pregledom osnovnih statistika smo uvideli da neke kolone u sebi imaju određene anomalije:\\\\
 
 \begin{figure}[H]
 \centering
@@ -145,7 +145,7 @@ U razmatranje smo takođe uzeli i atribute koji nisu direktno dostupni u samom s
             \item \textbf{color\_u\_g}: Razlika između magnituda u ultraljubičastom (u) i zelenom (g) delu spektra: $color\_u\_g = u - g$.
             \item \textbf{color\_g\_r}: Razlika između magnituda u zelenom (g) i crvenom (r) delu spektra: $color\_g\_r = g - r$.
             \item \textbf{color\_r\_i}: Razlika između magnituda u crvenom (r) i bliskom infracrvenom (i) delu spektra: $color\_r\_i = r - i$.
-            \item \textbf{color\_i\_z}: Razlika između magnituda u bliskom infracrvenom (i) i dalekom infracrvenom (z) delu spektra: $color\_i\_z = i - z$.
+            \item \textbf{color\_i\_z}: Razlika između magnituda u bliskom infracrvenom delu spektra (i) i (z): $color\_i\_z = i - z$.
         \end{itemize}
 
 \subsubsection{RA \& DEC}
@@ -182,7 +182,7 @@ Magnituda je mera sjaja nebeskog objekta viđenog sa Zemlje. Postoji pet filtera
     \item \textbf{g (zeleni filter)}: Mera sjaja u zelenom delu spektra (476 nm).
     \item \textbf{r (crveni filter)}: Mera sjaja u crvenom delu spektra (628 nm).
     \item \textbf{i (bliski infracrveni filter)}: Mera sjaja u bliskom infracrvenom delu spektra (769 nm).
-    \item \textbf{z (daleki infracrveni filter)}: Mera sjaja u dalekom infracrvenom delu spektra (925 nm).
+    \item \textbf{z (bliski infracrveni filter)}: Mera sjaja u bliskom infracrvenom delu spektra (925 nm).
 \end{itemize}
 Značaj magnituda može se uočiti kroz prikaz odgovarajuće korelacione matrice za ove atribute.
 \\\\Korelaciona matrica je vizualni prikaz koji pokazuje međusobnu povezanost različitih atributa korišćenih u skupu podataka.
@@ -422,7 +422,7 @@ Slično kao i kod prethodnih modela, za traženje najboljeg skupa hiperparametar
     }
 \end{verbatim}
 \begin{itemize}
-    \item \textbf{n\textunderscore neighbors}: Ovo predstavlja broj najbližih suseda koje k-NN algoritam treba da uzme u obzir.
+    \item \textbf{n\textunderscore neighbors}: Ovo predstavlja broj najbližih suseda koje K-NN algoritam treba da uzme u obzir.
     \item \textbf{weights}: Ovo određuje način na koji se računa doprinos svakog suseda. Postoje dve opcije:
     \begin{itemize}
         \item \textbf{uniform}: Svi susedi imaju isti doprinos bez obzira na udaljenost
@@ -467,7 +467,7 @@ Vidimo da ovaj model postiže lošije rezultate u odnosu na prvobitna dva algori
 Metod slučajnih šuma se zasniva na prostoj agregaciji stabala odlučivanja. Ansambl (skupovi većeg broja modela koji zajednički donose odluke) se sastoji od m stabala treniranih na različitim podskupovima skupa za obučavanje. Jedno stablo se obučava tako što se izabere podskup skupa za obučavanje odredene veličine, pri čemu je moguće koristiti i samo podskup ukupnog skupa atributa. Stabla se obučavaju na različitim podskupovima kako bi njihove greške bile što slabije korelisane, što ostavlja prostor za popravku agregacijom.
 \\\\Slučajne šume su jedan od najprimenjenijih algoritama mašinskog učenja.
 Njihovo obučavanje je relativno efikasno, a preciznost predvidjanja obično među
-najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume su: zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage..
+najboljim za vektorski predstavljene podatke. Njegova jednostavnost korišćenja i fleksibilnost doprineli su njegovoj popularnosti, jer može da rešava i klasifikacione i regresione probleme. Neki od nedostataka upotrebe algoritma slučajne šume su: zahteva više resursa za obradu, troši više vremena u poređenju sa algoritmom stabla odluke, manje je intuitivan kada imamo veliki broj stabala odluke, izuzetno je složen i zahteva više računske snage.
 
 \subsubsection{Treniranje modela}
 Kao i kod prethodnih algoritama, koristili smo prethodno podeljene skupove za trening i test. Korišćenje slučajne šume obično ne zahteva skaliranje podataka. Algoritmi za slučajne šume, kao i drugi algoritmi bazirani na stablima odluke, nisu osetljivi na skalu ili distribuciju podataka.
